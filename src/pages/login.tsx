@@ -32,16 +32,17 @@ export default function Login() {
   return (
     <div className={styles.container}>
       <Header />
-      <h2 className={styles.heading}>Кошелек: RUBD (Цифровой Рубль)</h2>
-      <h1 className={styles.h1}>Авторизация</h1>
+      <h2 className={styles.heading}>Кошелек: BDC (Bank Digital Currency)</h2>
+      <h1 className={styles.h1}>Личный кабинет</h1>
 
       <p className={styles.explain}>
-        Покупайте и продавайте RUBD, используя свой рублевый счет.
+        Покупайте и продавайте банковские токены BDC, используя свой банковский
+        счет.
       </p>
 
       <div className={styles.card}>
-        <h3>Кошелек</h3>
-        <p>Для продолжения Вам необходимо: </p>
+        <h3>Ваш баланс BDC:</h3>
+        <p></p>
 
         {contractMetadata && (
           <div className={styles.nft}>
@@ -91,7 +92,7 @@ export async function getServerSideProps(context) {
   const sdk = ThirdwebSDK.fromPrivateKey(
     process.env.THIRDWEB_AUTH_PRIVATE_KEY,
     "sepolia",
-    { secretKey }
+    { secretKey },
   );
 
   // Check to see if the user has an NFT

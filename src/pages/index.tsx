@@ -5,14 +5,14 @@ import {
   useContractMetadata,
   useUser,
 } from "@thirdweb-dev/react";
-import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { getUser } from "../../auth.config";
+
 import { contractAddress } from "../../const/yourDetails";
 import { Header } from "../components/Header";
 import styles from "../styles/Home.module.css";
 import checkBalance from "../util/checkBalance";
+import getServerSideProps from "../util/props";
 import { Sepolia } from "@thirdweb-dev/chains";
 export default function Home() {
   const { user, isLoggedIn, isLoading } = useUser();
@@ -36,21 +36,21 @@ export default function Home() {
         }
       })();
     }
-  }, [isLoading, isLoggedIn, router, contractMetadata]);
+  }, [isLoading, isLoggedIn, user, router]);
 
   return (
     <div className={styles.container}>
       <Header />
-      <h2 className={styles.heading}>Кошелек: BDC (Bank Digital Currency)</h2>
+      <h2 className={styles.heading}>Кошелек: iBDC (iBank Digital Currency)</h2>
       <h1 className={styles.h1}>Личный кабинет</h1>
 
       <p className={styles.explain}>
-        Покупайте и продавайте банковские токены BDC, используя свой банковский
+        Покупайте и продавайте банковские токены iBDC, используя свой банковский
         счет.
       </p>
 
       <div className={styles.card}>
-        <h3>Ваш баланс BDC:</h3>
+        <h3>Ваш баланс iBDC:</h3>
         <p></p>
 
         {contractMetadata && (
@@ -95,54 +95,4 @@ export default function Home() {
   );
 }
 
-// This gets called on every request
-export async function getServerSideProps(context) {
-  const user = await getUser(context.req);
 
-  if (!user) {
-    return {
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
-    };
-  }
-
-  const secretKey = process.env.TW_SECRET_KEY;
-
-  if (!secretKey) {
-    console.log("Missing env var: TW_SECRET_KEY");
-    throw new Error("Missing env var: TW_SECRET_KEY");
-  }
-
-  // Ensure we are able to generate an auth token using our private key instantiated SDK
-  const PRIVATE_KEY = process.env.THIRDWEB_AUTH_PRIVATE_KEY;
-  if (!PRIVATE_KEY) {
-    throw new Error("You need to add an PRIVATE_KEY environment variable.");
-  }
-
-  // Instantiate our SDK
-  const sdk = ThirdwebSDK.fromPrivateKey(
-    process.env.THIRDWEB_AUTH_PRIVATE_KEY,
-    "sepolia",
-    { secretKey },
-  );
-
-  // Check to see if the user has an NFT
-  const hasNft = await checkBalance(sdk, user.address);
-
-  // If they don't have an NFT, redirect them to the login page
-  if (!hasNft) {
-    return {
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
-    };
-  }
-
-  // Finally, return the props
-  return {
-    props: {},
-  };
-}

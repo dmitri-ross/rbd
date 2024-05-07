@@ -4,7 +4,7 @@ import {
   useAddress,
   useContract,
   useContractMetadata,
-  useOwnedNFTs,
+  useUser
 } from "@thirdweb-dev/react";
 import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { useRouter } from "next/router";
@@ -13,103 +13,34 @@ import { getUser } from "../../auth.config";
 import { contractAddress } from "../../const/yourDetails";
 import { Header } from "../components/Header";
 import styles from "../styles/Home.module.css";
-import checkKYCNft from "../util/checkBalance";
 
 export default function Login() {
   const { contract } = useContract(contractAddress);
   const { data: contractMetadata, isLoading: contractLoading } =
     useContractMetadata(contract);
   const address = useAddress();
-  const { data: nfts } = useOwnedNFTs(contract, address);
   const router = useRouter();
-
+  const { user, isLoggedIn, isLoading } = useUser();
   useEffect(() => {
-    if (address?.length) {
+    if (isLoggedIn) {
       router.push("/");
     }
-  }, [nfts, router, address]);
+  }, [router, isLoggedIn]);
 
   return (
     <div className={styles.container}>
       <Header />
-      <h2 className={styles.heading}>Кошелек: BDC (Bank Digital Currency)</h2>
-      <h1 className={styles.h1}>Личный кабинет</h1>
+      <h2 className={styles.heading}>Кошелек iBDC (iBank Digital Currency)</h2>
+      <h1 className={styles.h1}>Авторизация</h1>
 
       <p className={styles.explain}>
-        Покупайте и продавайте банковские токены BDC, используя свой банковский
+        Покупайте и продавайте банковские токены iBDC, используя свой банковский
         счет.
       </p>
 
       <div className={styles.card}>
-        <h3>Ваш баланс BDC:</h3>
-        <p></p>
-
-        {contractMetadata && (
-          <div className={styles.nft}>
-            <MediaRenderer
-              src={contractMetadata.image}
-              alt={contractMetadata.name}
-              width="70px"
-              height="70px"
-            />
-            <div className={styles.nftDetails}>
-              <h4>{contractMetadata.name}</h4>
-              <p>{contractMetadata.description?.substring(0, 100)}...</p>
-            </div>
-          </div>
-        )}
-        {contractLoading && <p>Загрузка...</p>}
-
         <ConnectWallet theme="dark" className={styles.connect} />
       </div>
     </div>
   );
-}
-
-export async function getServerSideProps(context) {
-  const user = await getUser(context.req);
-
-  if (!user) {
-    return {
-      props: {},
-    };
-  }
-
-  const secretKey = process.env.TW_SECRET_KEY;
-
-  if (!secretKey) {
-    console.log("Missing env var: TW_SECRET_KEY");
-    throw new Error("Missing env var: TW_SECRET_KEY");
-  }
-
-  // Ensure we are able to generate an auth token using our private key instantiated SDK
-  const PRIVATE_KEY = process.env.THIRDWEB_AUTH_PRIVATE_KEY;
-  if (!PRIVATE_KEY) {
-    throw new Error("You need to add an PRIVATE_KEY environment variable.");
-  }
-
-  // Instantiate our SDK
-  const sdk = ThirdwebSDK.fromPrivateKey(
-    process.env.THIRDWEB_AUTH_PRIVATE_KEY,
-    "sepolia",
-    { secretKey },
-  );
-
-  // Check to see if the user has an NFT
-  const hasKYCNft = await checkKYCNft(sdk, user.address);
-
-  // If they have an NFT, redirect them to the home page
-  if (hasKYCNft || true) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-  }
-
-  // Finally, return the props
-  return {
-    props: {},
-  };
 }

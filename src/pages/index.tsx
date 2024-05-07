@@ -1,98 +1,102 @@
+import { AccountHeader } from "@/components/AccountHeader";
+import { ConnectBlock } from "@/components/ConnectBlock";
+import { Header } from "@/components/Header";
+import styles from "@/styles/Home.module.css";
+import { Button, ButtonGroup } from "@nextui-org/button";
 import {
-  ConnectWallet,
   MediaRenderer,
   useContract,
   useContractMetadata,
-  useUser,
+  useUser
 } from "@thirdweb-dev/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { contractAddresses } from "../../const/contracts";
 
-import { contractAddress } from "../../const/yourDetails";
-import { Header } from "../components/Header";
-import styles from "../styles/Home.module.css";
-import checkBalance from "../util/checkBalance";
-import getServerSideProps from "../util/props";
-import { Sepolia } from "@thirdweb-dev/chains";
 export default function Home() {
   const { user, isLoggedIn, isLoading } = useUser();
   const router = useRouter();
-  const { contract } = useContract(contractAddress);
-  const { data: contractMetadata, isLoading: contractLoading } =
-    useContractMetadata(contract);
-  const [balance, setBalance] = useState("0.00");
+
+  // Define contracts with identifiers
+  const contracts = ["RUB", "USD", "IND"].map((currency) => {
+    const contract = useContract(contractAddresses[currency]);
+    const metadata = useContractMetadata(contract.contract);
+    return { currency, contract, metadata };
+  });
+
+  const [balance, setBalance] = useState({
+    RUB: "0.00",
+    USD: "0.00",
+    IND: "0.00",
+  });
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {
       router.push("/login");
-    } else if (contract && user?.address) {
-      (async () => {
-        try {
-          const balance = await contract.erc20.balanceOf(user?.address);
-          setBalance(balance.displayValue);
-          console.log(balance.displayValue);
-        } catch (error) {
-          console.error("Failed to fetch the balance", error);
+    } else if (user?.address) {
+      contracts.forEach(async ({ currency, contract }) => {
+        if (contract.contract?.erc20) {
+          try {
+            const result = await contract.contract.erc20.balanceOf(
+              user.address
+            );
+            setBalance((prev) => ({
+              ...prev,
+              [currency]: result.displayValue,
+            }));
+          } catch (error) {
+            console.error(`Failed to fetch the balance for ${currency}`, error);
+          }
         }
-      })();
+      });
     }
-  }, [isLoading, isLoggedIn, user, router]);
+  }, [isLoading, isLoggedIn, user, router, contracts]);
+
+  const handleNavigation = (url) => router.push(url);
 
   return (
     <div className={styles.container}>
       <Header />
-      <h2 className={styles.heading}>Кошелек: iBDC (iBank Digital Currency)</h2>
-      <h1 className={styles.h1}>Личный кабинет</h1>
 
-      <p className={styles.explain}>
-        Покупайте и продавайте банковские токены iBDC, используя свой банковский
-        счет.
-      </p>
-
+      <AccountHeader/>
+      
       <div className={styles.card}>
+        <ButtonGroup className="mg-20" variant="shadow" fullWidth={true}>
+          <Button
+            onPress={() => handleNavigation("/deposit")}
+            color="secondary"
+          >
+            Депозит
+          </Button>
+          <Button onPress={() => handleNavigation("/withdraw")} color="secondary">Вывод</Button>
+          <Button isDisabled color="secondary">
+            Обмен
+          </Button>
+        </ButtonGroup>
         <h3>Ваш баланс iBDC:</h3>
-        <p></p>
-
-        {contractMetadata && (
-          <div className={styles.nft}>
-            <MediaRenderer
-              src={contractMetadata.image}
-              alt={contractMetadata.name}
-              width="70px"
-              height="70px"
-            />
-            <div className={styles.nftDetails}>
-              <h4>{contractMetadata.name}</h4>
-              <p>{contractMetadata.description}</p>
-              <p>
-                {balance} {contractMetadata.symbol}
-              </p>
-            </div>
-          </div>
+        {contracts.map(
+          ({ currency, metadata }, index) =>
+            metadata.data && (
+              <div key={index} className={styles.nft}>
+                <MediaRenderer
+                  src={metadata.data.image}
+                  alt={metadata.data.name}
+                  width="70px"
+                  height="70px"
+                />
+                <div className={styles.nftDetails}>
+                  <h4>{metadata.data.name}</h4>
+                  <p>{metadata.data.description}</p>
+                  <p>
+                    {balance[currency]} {metadata.data.symbol}
+                  </p>
+                </div>
+                {metadata.isLoading && <p>Loading...</p>}
+              </div>
+            )
         )}
-        {contractLoading && <p>Loading...</p>}
-
-        <ConnectWallet
-          hideSwitchToPersonalWallet={true}
-          displayBalanceToken={{
-            11155111: "0xf5423Aa5B7b0FD6C40aACbfAA08Ef0435B5Ed233",
-          }}
-          supportedTokens={{
-            [11155111]: [
-              {
-                address: "0xf5423Aa5B7b0FD6C40aACbfAA08Ef0435B5Ed233", // token contract address
-                name: "Digital Ruble",
-                symbol: "RUBD",
-                icon: `https://adfdc075945d7175b430c250264cf70e.ipfscdn.io/ipfs/bafybeibjllqrgnuhyq5hkflvu2hbeppe3g444c6xrwrxjdqj4s7u7q7lda/DALL%C2%B7E%202024-04-30%2013.54.00%20-%20Create%20a%20modern%2C%20sleek%20logo%20inspired%20by%20the%20uploaded%20image%20but%20designed%20for%20a%20digital%20currency%20named%20'Digital%20Ruble'.%20The%20logo%20should%20feature%20three%20st.png`,
-              },
-            ],
-          }}
-          theme="dark"
-          className={styles.connect}
-        />
+        <ConnectBlock/>
       </div>
     </div>
   );
 }
-
-

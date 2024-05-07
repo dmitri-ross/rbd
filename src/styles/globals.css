@@ -1,4 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Box sizing rules */
 *,
@@ -41,4 +44,20 @@ body {
 
 h2 {
   font-size: 2rem;
+}
+.mg-20 {
+  margin-bottom: 20px;
+}
+
+.mg-top-20 {
+  margin-top: 20px;
+}
+.max-w-350{
+  max-width: 350px;
+}
+.text-align-left{
+  text-align: left;
+}
+.w-320{
+  width: 320px;
 }

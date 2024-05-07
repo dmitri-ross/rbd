@@ -25,25 +25,7 @@ export async function getServerSideProps(context) {
     throw new Error("You need to add an PRIVATE_KEY environment variable.");
   }
 
-  // Instantiate our SDK
-  const sdk = ThirdwebSDK.fromPrivateKey(
-    process.env.THIRDWEB_AUTH_PRIVATE_KEY,
-    "sepolia",
-    { secretKey },
-  );
-
-  // // Check to see if the user has an NFT
-  // const hasNft = await checkBalance(sdk, user.address);
-
-  // // If they don't have an NFT, redirect them to the login page
-  // if (!hasNft) {
-  //   return {
-  //     redirect: {
-  //       destination: "/login",
-  //       permanent: false,
-  //     },
-  //   };
-  // }
+  
 
   // Finally, return the props
   return {
@@ -51,4 +33,4 @@ export async function getServerSideProps(context) {
   };
 }
 
-  export default getServerSideProps;
+export default getServerSideProps;

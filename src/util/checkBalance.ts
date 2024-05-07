@@ -1,7 +1,7 @@
 import { detectFeatures } from "@thirdweb-dev/sdk";
 import {
   contractAddress,
-} from "const/yourDetails";
+} from "const/contracts";
 export default async function checkKYCNft(sdk, address) {
   const contract = await sdk.getContract(
     contractAddress // replace this with your contract address

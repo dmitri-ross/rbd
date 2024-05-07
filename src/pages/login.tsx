@@ -1,26 +1,17 @@
 import {
   ConnectWallet,
-  MediaRenderer,
-  useAddress,
-  useContract,
-  useContractMetadata,
   useUser
 } from "@thirdweb-dev/react";
-import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { getUser } from "../../auth.config";
-import { contractAddress } from "../../const/yourDetails";
 import { Header } from "../components/Header";
 import styles from "../styles/Home.module.css";
 
 export default function Login() {
-  const { contract } = useContract(contractAddress);
-  const { data: contractMetadata, isLoading: contractLoading } =
-    useContractMetadata(contract);
-  const address = useAddress();
+ 
+  
   const router = useRouter();
-  const { user, isLoggedIn, isLoading } = useUser();
+  const { isLoggedIn } = useUser();
   useEffect(() => {
     if (isLoggedIn) {
       router.push("/");

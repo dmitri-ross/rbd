@@ -1,5 +1,5 @@
 // Replace this with your contract address
-export const contractAddress = "0xf5423Aa5B7b0FD6C40aACbfAA08Ef0435B5Ed233";
+export const contractAddresses = { "RUB": "0xe546AE1D6c9b8F5B7AE856Da9E9148Db05564B94", "USD": "0x54bccB971FeB8917d80a252D20A1725a6DbE0BE4", "IND": "0x30137348b9e8bFFbC476Dcf06A5383150cD3443E" }
 
 // Replace this with your domain name.
 export const domainName = "localhost";

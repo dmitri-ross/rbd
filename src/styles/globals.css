@@ -61,3 +61,6 @@ h2 {
 .w-320{
   width: 320px;
 }
+.checkDis[disabled]{
+  background: #666666
+}

@@ -55,7 +55,7 @@ function App({ Component, pageProps }) {
         ]}
       >
         <Head>
-          <title>Кошелек RUBD v0.1</title>
+          <title>Кошелек iBDC v0.1</title>
           <meta
             name="viewport"
             content="width=device-width, initial-scale=1.0"

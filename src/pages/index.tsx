@@ -1,65 +1,106 @@
 import { AccountHeader } from "@/components/AccountHeader";
 import { ConnectBlock } from "@/components/ConnectBlock";
 import { Header } from "@/components/Header";
+import contractStore from "@/stores/ContractStore";
 import styles from "@/styles/Home.module.css";
 import { Button, ButtonGroup } from "@nextui-org/button";
 import {
   MediaRenderer,
   useContract,
   useContractMetadata,
-  useUser
+  useUser,
+  useBalance,
 } from "@thirdweb-dev/react";
+import { observer } from "mobx-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { contractAddresses } from "../../const/contracts";
-
-export default function Home() {
+const Home = observer(() => {
   const { user, isLoggedIn, isLoading } = useUser();
   const router = useRouter();
 
-  // Define contracts with identifiers
-  const contracts = ["RUB", "USD", "IND"].map((currency) => {
-    const contract = useContract(contractAddresses[currency]);
-    const metadata = useContractMetadata(contract.contract);
-    return { currency, contract, metadata };
-  });
+  useEffect(() => {
+    // Redirect logic
+    if (!isLoading && !isLoggedIn) {
+      router.push("/login");
+    }
+  }, [isLoading, isLoggedIn, router]);
+  const contractRUB = useContract(contractAddresses["RUB"]);
+  const metadataRUB = useContractMetadata(contractRUB.contract);
 
+  const contractUSD = useContract(contractAddresses["USD"]);
+  const metadataUSD = useContractMetadata(contractUSD.contract);
+
+  const contractIND = useContract(contractAddresses["IND"]);
+  const metadataIND = useContractMetadata(contractIND.contract);
+
+  const { data: balanceRUB } = useBalance(contractAddresses["RUB"]);
+  const { data: balanceUSD } = useBalance(contractAddresses["USD"]);
+  const { data: balanceINR } = useBalance(contractAddresses["INR"]);
   const [balance, setBalance] = useState({
     RUB: "0.00",
     USD: "0.00",
     IND: "0.00",
   });
+  useEffect(() => {
+    setBalance({
+      RUB: balanceRUB?.displayValue,
+      USD: balanceUSD?.displayValue,
+      IND: balanceINR?.displayValue,
+    });
+  }, [
+    balanceRUB?.displayValue,
+    balanceUSD?.displayValue,
+    balanceINR?.displayValue,
+  ]);
+
+  const [fetchedContracts, setFetchedContracts] = useState([]);
+
+  useEffect(() => {
+    console.log(1);
+
+    const contracts = [
+      { currency: "RUB", contract: contractRUB, metadata: metadataRUB },
+      { currency: "USD", contract: contractUSD, metadata: metadataUSD },
+      { currency: "IND", contract: contractIND, metadata: metadataIND },
+    ];
+
+    contractStore.setContracts(contracts);
+    console.log(2);
+    setFetchedContracts(contracts);
+    console.log(fetchedContracts);
+  }, [contractIND.contract]);
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {
       router.push("/login");
     } else if (user?.address) {
-      contracts.forEach(async ({ currency, contract }) => {
-        if (contract.contract?.erc20) {
-          try {
-            const result = await contract.contract.erc20.balanceOf(
-              user.address
-            );
-            setBalance((prev) => ({
-              ...prev,
-              [currency]: result.displayValue,
-            }));
-          } catch (error) {
-            console.error(`Failed to fetch the balance for ${currency}`, error);
-          }
-        }
-      });
+      // contractStore.contractsData.forEach(async ({ currency, contract }) => {
+      //   if (contract.contract?.erc20) {
+      //     try {
+      //       const result = await contract.contract.erc20.balanceOf(
+      //         user.address
+      //       );
+      //       setBalance((prev) => ({
+      //         ...prev,
+      //         [currency]: result.displayValue,
+      //       }));
+      //     } catch (error) {
+      //       console.error(`Failed to fetch the balance for ${currency}`, error);
+      //     }
+      //   }
+      // });
     }
-  }, [isLoading, isLoggedIn, user, router, contracts]);
+  }, [isLoading, isLoggedIn, user, router, contractStore.contractsData]);
 
-  const handleNavigation = (url) => router.push(url);
+  const handleNavigation = (url) => {
+    router.push(url);
+  };
 
   return (
     <div className={styles.container}>
       <Header />
-
-      <AccountHeader/>
-      
+      <AccountHeader />
       <div className={styles.card}>
         <ButtonGroup className="mg-20" variant="shadow" fullWidth={true}>
           <Button
@@ -68,13 +109,18 @@ export default function Home() {
           >
             Депозит
           </Button>
-          <Button onPress={() => handleNavigation("/withdraw")} color="secondary">Вывод</Button>
+          <Button
+            onPress={() => handleNavigation("/withdraw")}
+            color="secondary"
+          >
+            Вывод
+          </Button>
           <Button isDisabled color="secondary">
             Обмен
           </Button>
         </ButtonGroup>
         <h3>Ваш баланс iBDC:</h3>
-        {contracts.map(
+        {contractStore.contractsData.map(
           ({ currency, metadata }, index) =>
             metadata.data && (
               <div key={index} className={styles.nft}>
@@ -95,8 +141,10 @@ export default function Home() {
               </div>
             )
         )}
-        <ConnectBlock/>
+        <ConnectBlock />
       </div>
     </div>
   );
-}
+});
+
+export default Home;

@@ -4,15 +4,21 @@ import {
   coinbaseWallet,
   walletConnect,
   embeddedWallet,
-  smartWallet,
+  smartWallet,  useContract,
+  useContractMetadata,
 } from "@thirdweb-dev/react";
+import { contractAddresses } from "../../const/contracts";
 import Head from "next/head";
 import { domainName } from "../../const/contracts";
 import russian from "../util/ru";
 import "../styles/globals.css";
 import { Sepolia } from "@thirdweb-dev/chains";
 import { NextUIProvider } from "@nextui-org/react";
-function MyApp({ Component, pageProps }) {
+
+function App({ Component, pageProps }) {
+
+
+   
   return (
     <NextUIProvider>
       <ThirdwebProvider
@@ -59,10 +65,11 @@ function MyApp({ Component, pageProps }) {
             content="Learn how to use the thirdweb Auth SDK to create an NFT Gated Website"
           />
         </Head>
-        <Component  {...pageProps} />
+        
+          <Component  {...pageProps} />
       </ThirdwebProvider>
     </NextUIProvider>
   );
 }
 
-export default MyApp;
+export default App;

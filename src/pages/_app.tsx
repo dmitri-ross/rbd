@@ -62,7 +62,7 @@ function App({ Component, pageProps }) {
           />
           <meta
             name="description"
-            content="Learn how to use the thirdweb Auth SDK to create an NFT Gated Website"
+            content="Покупайте и продавайте банковские токены iBDC, используя свой банковский счет."
           />
         </Head>
         

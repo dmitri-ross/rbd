@@ -14,7 +14,8 @@ export default function Login() {
   const { isLoggedIn } = useUser();
   useEffect(() => {
     if (isLoggedIn) {
-      router.push("/");
+      // router.push("/");
+      window.location.href = "/";
     }
   }, [router, isLoggedIn]);
 

@@ -3,7 +3,7 @@ import { ConnectBlock } from "@/components/ConnectBlock";
 import { Header } from "@/components/Header";
 import contractStore from "@/stores/ContractStore";
 import styles from "@/styles/Home.module.css";
-import { Button } from "@nextui-org/button";
+import { Button, ButtonGroup } from "@nextui-org/button";
 import { useContract, useContractMetadata, useUser } from "@thirdweb-dev/react";
 import { observer } from "mobx-react";
 import { useRouter } from "next/router";
@@ -47,13 +47,11 @@ const Deposit = observer(() => {
       <Header />
       <AccountHeader />
       <div className={styles.card}>
-        <Button
-          className="mg-20"
-          onClick={() => handleNavigation("/")}
-          color="secondary"
-        >
-          Назад
-        </Button>
+        <ButtonGroup className="mg-20" variant="shadow" fullWidth={true}>
+          <Button onClick={() => handleNavigation("/")} color="secondary">
+            Назад
+          </Button>
+        </ButtonGroup>
         <h4>Выберите валюту для депозита средств на iBDC:</h4>
         {contractStore.contractsData.map((contract, index) => (
           <Button

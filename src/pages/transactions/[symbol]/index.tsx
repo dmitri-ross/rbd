@@ -6,6 +6,7 @@ import { WithdrawBlock } from "@/components/WithdrawBlock";
 import TokensTxBlock from "@/components/TokensTxBlock";
 import styles from "@/styles/Home.module.css";
 import { Button, ButtonGroup } from "@nextui-org/button";
+import { Breadcrumbs, BreadcrumbItem } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { ConnectBlock } from "@/components/ConnectBlock";
 export default function Transactions() {
@@ -22,12 +23,16 @@ export default function Transactions() {
     <div className={styles.container}>
       <Header />
       <AccountHeader />
+
       <div className={styles.card}>
-        <ButtonGroup className="mg-20" variant="shadow" fullWidth={true}>
+        <Breadcrumbs className="dark mg-10">
+          <BreadcrumbItem onClick={goBack}>&#60; Назад</BreadcrumbItem>
+        </Breadcrumbs>
+        {/* <ButtonGroup className="mg-20" variant="shadow" fullWidth={true}>
           <Button onPress={goBack} color="secondary">
             Назад
           </Button>
-        </ButtonGroup>
+        </ButtonGroup> */}
         <ConnectBlock symbol={symbol?.toString()} />
         <ButtonGroup
           className="mg-20 mg-top-20"
@@ -56,7 +61,7 @@ export default function Transactions() {
             Обмен
           </Button>
         </ButtonGroup>
-        <h3>Список транзакций {symbol}:</h3>
+        <h3>Список транзакций {symbol}i:</h3>
 
         <TokensTxBlock symbol={symbol} />
       </div>

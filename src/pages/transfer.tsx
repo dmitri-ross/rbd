@@ -10,6 +10,7 @@ import styles from "@/styles/Home.module.css";
 import { useContract, useContractMetadata, useUser } from "@thirdweb-dev/react";
 import { useEffect, useState } from "react";
 import { contractAddresses } from "../../const/contracts";
+import { Breadcrumbs, BreadcrumbItem } from "@nextui-org/react";
 const Transfer = observer(() => {
   const { user, isLoggedIn, isLoading } = useUser();
   const router = useRouter();
@@ -52,15 +53,20 @@ const Transfer = observer(() => {
       <Header />
       <AccountHeader />
       <div className={styles.card}>
-        <ButtonGroup className="mg-20" variant="shadow" fullWidth={true}>
+        <Breadcrumbs className="dark mg-10">
+          <BreadcrumbItem onClick={goBack}>&#60; Назад</BreadcrumbItem>
+        </Breadcrumbs>
+        {/* <ButtonGroup className="mg-20" variant="shadow" fullWidth={true}>
           <Button
             onClick={goBack} // Changed from onPress to onClick
             color="secondary"
           >
             Назад
           </Button>
-        </ButtonGroup>
-        <h4 className="mg-20">Выберите валюту для перевода средств на другой кошелек:</h4>
+        </ButtonGroup> */}
+        <h4 className="mg-20">
+          Выберите валюту для перевода средств на другой кошелек:
+        </h4>
 
         {contractStore.contractsData.map(
           ({ currency, metadata }, index) =>

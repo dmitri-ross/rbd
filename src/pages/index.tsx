@@ -11,6 +11,7 @@ import {
   useUser,
   useBalance,
 } from "@thirdweb-dev/react";
+import { Breadcrumbs, BreadcrumbItem } from "@nextui-org/react";
 import { observer } from "mobx-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -102,6 +103,7 @@ const Home = observer(() => {
       <Header />
       <AccountHeader />
       <div className={styles.card}>
+        
         <ConnectBlock />
 
         <ButtonGroup

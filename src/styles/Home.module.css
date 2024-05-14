@@ -72,8 +72,9 @@
 .nft {
   display: flex;
   align-items: center;
-  margin-top: 5px;
+  /* margin-top: 5px; */
   cursor: pointer;
+  width:100%;
 }
 
 .nftDetails {

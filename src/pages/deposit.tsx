@@ -9,6 +9,7 @@ import { observer } from "mobx-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { contractAddresses } from "../../const/contracts";
+import { Breadcrumbs, BreadcrumbItem } from "@nextui-org/react";
 const Deposit = observer(() => {
   const { user, isLoggedIn, isLoading } = useUser();
   const router = useRouter();
@@ -51,13 +52,14 @@ const Deposit = observer(() => {
       <Header />
       <AccountHeader />
       <div className={styles.card}>
-        <ButtonGroup className="mg-20" variant="shadow" fullWidth={true}>
+        {/* <ButtonGroup className="mg-20" variant="shadow" fullWidth={true}>
           <Button onClick={goBack} color="secondary">
             Назад
           </Button>
-        </ButtonGroup>
-
-        
+        </ButtonGroup> */}
+        <Breadcrumbs className="dark mg-10">
+          <BreadcrumbItem onClick={goBack}>&#60; Назад</BreadcrumbItem>
+        </Breadcrumbs>
 
         <h4 className="mg-20">Выберите валюту для депозита средств на iBDC:</h4>
         {contractStore.contractsData.map((contract, index) => (

@@ -4,6 +4,7 @@ import { WithdrawBlock } from "@/components/WithdrawBlock";
 import styles from "@/styles/Home.module.css";
 import { Button, ButtonGroup } from "@nextui-org/button";
 import { useRouter } from "next/router";
+import { Breadcrumbs, BreadcrumbItem } from "@nextui-org/react";
 export default function Withdraw() {
   const router = useRouter();
   const { symbol } = router.query;
@@ -17,11 +18,14 @@ export default function Withdraw() {
       <Header />
       <AccountHeader />
       <div className={styles.card}>
-        <ButtonGroup className="mg-20" variant="shadow" fullWidth={true}>
+        <Breadcrumbs className="dark mg-10">
+          <BreadcrumbItem onClick={goBack}>&#60; Назад</BreadcrumbItem>
+        </Breadcrumbs>
+        {/* <ButtonGroup className="mg-20" variant="shadow" fullWidth={true}>
           <Button onPress={goBack} color="secondary">
             Назад
           </Button>
-        </ButtonGroup>
+        </ButtonGroup> */}
         <h3>Вывод средств {symbol}i:</h3>
 
         <WithdrawBlock symbol={symbol?.toString()} />

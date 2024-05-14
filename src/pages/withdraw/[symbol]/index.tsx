@@ -21,11 +21,7 @@ export default function Withdraw() {
         <Breadcrumbs className="dark mg-10">
           <BreadcrumbItem onClick={goBack}>&#60; Назад</BreadcrumbItem>
         </Breadcrumbs>
-        {/* <ButtonGroup className="mg-20" variant="shadow" fullWidth={true}>
-          <Button onPress={goBack} color="secondary">
-            Назад
-          </Button>
-        </ButtonGroup> */}
+        
         <h3>Вывод средств {symbol}i:</h3>
 
         <WithdrawBlock symbol={symbol?.toString()} />

@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 import { getUser } from "../../../auth.config";
-;
+
 export default async function handler(req, res) {
 
   const user = await getUser(req);

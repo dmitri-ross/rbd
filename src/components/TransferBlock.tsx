@@ -8,13 +8,13 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@nextui-org/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import {
   Web3Button,
   useAddress,
-  useContract,
   useBalance,
+  useContract,
 } from "@thirdweb-dev/react";
 import { BigNumber, ethers } from "ethers";
 import { contractAddresses } from "../../const/contracts";

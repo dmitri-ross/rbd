@@ -1,18 +1,14 @@
 // components/TokensTxBlock.js
 
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { Card, CardBody } from "@nextui-org/react";
 import styles from "@/styles/Home.module.css";
-import { contractAddresses, explorerBaseURL } from "../../const/contracts";
 import shortenAddress from "@/util/formatAddress";
+import { Card, CardBody } from "@nextui-org/react";
 import {
-  MediaRenderer,
-  useContract,
-  useContractMetadata,
-  useUser,
-  useBalance,
+  useUser
 } from "@thirdweb-dev/react";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { contractAddresses, explorerBaseURL } from "../../const/contracts";
 
 export default function TokensTxBlock({ symbol }) {
   const [transactions, setTransactions] = useState([]);

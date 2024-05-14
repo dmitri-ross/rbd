@@ -8,20 +8,21 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@nextui-org/react";
+import { useEffect, useState } from "react";
 import {
   contractAddresses,
   withdrawContractAddress,
 } from "../../const/contracts";
-import { useEffect, useState } from "react";
 
 import {
   Web3Button,
   useAddress,
-  useContract,
   useBalance,
+  useContract,
 } from "@thirdweb-dev/react";
+import axios from "axios";
 import { BigNumber, ethers } from "ethers";
-export const WithdrawBlock = ({symbol = "RUB"}) => {
+export const WithdrawBlock = ({ symbol = "RUB" }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const tokenAddress = contractAddresses[symbol];
@@ -36,7 +37,16 @@ export const WithdrawBlock = ({symbol = "RUB"}) => {
   const [bik, setBik] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("0");
-
+  const sendTransactionDetailsToAPI = async (transactionDetails) => {
+    try {
+      const response = await axios.post("/api/transaction-success", {
+        data: transactionDetails,
+      });
+      console.log("API response:", response.data);
+    } catch (error) {
+      console.error("Error sending transaction details:", error);
+    }
+  };
   async function checkApprove() {
     const allowance = await tokenContract?.call("allowance", [
       address,
@@ -65,11 +75,21 @@ export const WithdrawBlock = ({symbol = "RUB"}) => {
       BigNumber.from(withdrawAmount).toString()
     );
     if (allowance.gte(BigNumber.from(amountInWei))) {
-      await contract.call("withdrawTokens", [
+      const tx = await contract.call("withdrawTokens", [
         tokenAddress,
         BigNumber.from(amountInWei),
         `${bankName}, ${bik}, ${accountNumber}`,
       ]);
+      await sendTransactionDetailsToAPI({
+        sender: address,
+        symbol,
+        tokenAddress,
+        amount: withdrawAmount,
+        bankName,
+        bik,
+        accountNumber,
+        txHash: tx?.receipt?.transactionHash || "0x",
+      });
       onOpen();
     } else {
       await contract.call("approve", [

@@ -11,7 +11,7 @@ async function sendMessageToTelegram(transactionHash: string, to: string, amount
   const text = `Deposit transaction minted successfully:
   - Transaction Hash: ${transactionHash}
   - To: ${to}
-  - Amount: ${etherAmount} ETH`;
+  - Amount: ${etherAmount}`;
 
   try {
     await axios.get(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {

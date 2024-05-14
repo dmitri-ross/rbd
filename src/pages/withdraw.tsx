@@ -43,6 +43,10 @@ const Withdraw = observer(() => {
     router.push(url);
   };
 
+  const goBack = () => {
+    router.back();
+  };
+
   return (
     <div className={styles.container}>
       <Header />
@@ -50,13 +54,13 @@ const Withdraw = observer(() => {
       <div className={styles.card}>
         <ButtonGroup className="mg-20" variant="shadow" fullWidth={true}>
           <Button
-            onClick={() => handleNavigation("/")} // Changed from onPress to onClick
+            onClick={goBack} // Changed from onPress to onClick
             color="secondary"
           >
             Назад
           </Button>
         </ButtonGroup>
-        <h4>Выберите валюту для вывода средств на банковский счет:</h4>
+        <h4 className="mg-20">Выберите валюту для вывода средств на банковский счет:</h4>
 
         {contractStore.contractsData.map(
           ({ currency, metadata }, index) =>
@@ -64,7 +68,7 @@ const Withdraw = observer(() => {
               <Button
                 key={index} // Moved key to Button from inner div
                 onClick={() => handleNavigation(`/withdraw/${currency}`)} // Changed from onPress to onClick
-                className="dark"
+                className="dark mg-20"
               >
                 <div className={styles.nft}>
                   <div className={styles.nftDetails}>

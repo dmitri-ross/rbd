@@ -1,14 +1,14 @@
 import { ConnectWallet } from "@thirdweb-dev/react";
-import Image from "next/image";
 import styles from "../styles/Header.module.css";
-import Link from "next/link";
+import { contractAddresses } from "../../const/contracts";
+export const ConnectBlock = ({ symbol = "RUB" }) => {
 
-export const ConnectBlock = () => {
+  
   return (
     <ConnectWallet
     hideSwitchToPersonalWallet={true}
     displayBalanceToken={{
-      11155111: "0xe546AE1D6c9b8F5B7AE856Da9E9148Db05564B94",
+      11155111: contractAddresses[symbol],
     }}
     supportedTokens={{
       [11155111]: [

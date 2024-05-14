@@ -57,7 +57,7 @@
 }
 
 .card > button {
-  margin-top: 20px !important;
+ 
   width: 100% !important;
   height: 50px !important;
   display: flex !important;
@@ -73,6 +73,7 @@
   display: flex;
   align-items: center;
   margin-top: 5px;
+  cursor: pointer;
 }
 
 .nftDetails {
@@ -87,4 +88,11 @@
   .card > button {
     width: 100% !important;
   }
+}
+.amountIn {
+  color: #7bcd7b;
+}
+
+.amountOut {
+  color: rgb(255, 88, 88);
 }

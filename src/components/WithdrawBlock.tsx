@@ -8,17 +8,27 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@nextui-org/react";
+import {
+  contractAddresses,
+  withdrawContractAddress,
+} from "../../const/contracts";
 import { useEffect, useState } from "react";
 
-import { Web3Button, useAddress, useContract } from "@thirdweb-dev/react";
+import {
+  Web3Button,
+  useAddress,
+  useContract,
+  useBalance,
+} from "@thirdweb-dev/react";
 import { BigNumber, ethers } from "ethers";
-export const WithdrawBlock = (symbol) => {
+export const WithdrawBlock = ({symbol = "RUB"}) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const withdrawContractAddress = "0x0De54BBd383811dC1461D2943e3C5Ab2751414cB";
-  const tokenAddress = "0xe546AE1D6c9b8F5B7AE856Da9E9148Db05564B94";
+  const tokenAddress = contractAddresses[symbol];
 
   const { contract: tokenContract } = useContract(tokenAddress);
+
+  const { data: balance } = useBalance(contractAddresses[symbol]);
   const address = useAddress();
   const [allowance, setAllowance] = useState(BigNumber.from("0"));
 
@@ -72,7 +82,7 @@ export const WithdrawBlock = (symbol) => {
 
   return (
     <>
-      {symbol.symbol == "RUB" && (
+      {symbol == "RUB" && (
         <>
           <div className="w-full flex flex-col gap-4">
             <div className=" dark flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
@@ -98,17 +108,20 @@ export const WithdrawBlock = (symbol) => {
                 required
               />
               <Input
+                className="mg-20"
                 type="number"
                 label="Сумма вывода:"
                 min="1"
                 required
-                placeholder="Укажите сумму"
+                placeholder={`Укажите сумму (Баланс: ${Number(
+                  balance?.displayValue || "0"
+                ).toFixed(2)})`}
                 onValueChange={setWithdrawAmount}
               />
             </div>
           </div>
           <Web3Button
-            className="checkDis"
+            className="checkDis "
             contractAddress={
               allowance && allowance?.gte(BigNumber.from(withdrawAmount))
                 ? withdrawContractAddress
@@ -129,7 +142,7 @@ export const WithdrawBlock = (symbol) => {
         </>
       )}
 
-      {symbol.symbol != "RUB" && (
+      {symbol != "RUB" && (
         <div className="w-full flex flex-col gap-4">
           <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
             <p>

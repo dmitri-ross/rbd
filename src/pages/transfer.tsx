@@ -1,15 +1,16 @@
+import { Button, ButtonGroup } from "@nextui-org/button";
+import { observer } from "mobx-react";
+import { useRouter } from "next/router";
+
 import { AccountHeader } from "@/components/AccountHeader";
 import { ConnectBlock } from "@/components/ConnectBlock";
 import { Header } from "@/components/Header";
 import contractStore from "@/stores/ContractStore";
 import styles from "@/styles/Home.module.css";
-import { Button, ButtonGroup } from "@nextui-org/button";
 import { useContract, useContractMetadata, useUser } from "@thirdweb-dev/react";
-import { observer } from "mobx-react";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { contractAddresses } from "../../const/contracts";
-const Deposit = observer(() => {
+const Transfer = observer(() => {
   const { user, isLoggedIn, isLoading } = useUser();
   const router = useRouter();
   const contractRUB = useContract(contractAddresses["RUB"]);
@@ -52,35 +53,39 @@ const Deposit = observer(() => {
       <AccountHeader />
       <div className={styles.card}>
         <ButtonGroup className="mg-20" variant="shadow" fullWidth={true}>
-          <Button onClick={goBack} color="secondary">
+          <Button
+            onClick={goBack} // Changed from onPress to onClick
+            color="secondary"
+          >
             Назад
           </Button>
         </ButtonGroup>
+        <h4 className="mg-20">Выберите валюту для перевода средств на другой кошелек:</h4>
 
-        
+        {contractStore.contractsData.map(
+          ({ currency, metadata }, index) =>
+            metadata.data && (
+              <Button
+                key={index} // Moved key to Button from inner div
+                onClick={() => handleNavigation(`/transfer/${currency}`)} // Changed from onPress to onClick
+                className="dark mg-20"
+              >
+                <div className={styles.nft}>
+                  <div className={styles.nftDetails}>
+                    <h4>
+                      {metadata.data.name} ({metadata.data.symbol})
+                    </h4>
+                  </div>
+                  {metadata.isLoading && <p>Loading...</p>}
+                </div>
+              </Button>
+            )
+        )}
 
-        <h4 className="mg-20">Выберите валюту для депозита средств на iBDC:</h4>
-        {contractStore.contractsData.map((contract, index) => (
-          <Button
-            key={index} // Ensure `key` is here
-            onClick={() => handleNavigation(`/deposit/${contract.currency}`)}
-            className="dark mg-20"
-          >
-            <div className={styles.nft}>
-              <div className={styles.nftDetails}>
-                <h4>
-                  {contract.metadata.data.name} ({contract.metadata.data.symbol}
-                  )
-                </h4>
-                {contract.metadata.isLoading && <p>Loading...</p>}
-              </div>
-            </div>
-          </Button>
-        ))}
         <ConnectBlock />
       </div>
     </div>
   );
 });
 
-export default Deposit;
+export default Transfer;

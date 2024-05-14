@@ -44,9 +44,9 @@ const Home = observer(() => {
   });
   useEffect(() => {
     setBalance({
-      RUB: balanceRUB?.displayValue,
-      USD: balanceUSD?.displayValue,
-      IND: balanceINR?.displayValue,
+      RUB: Number(balanceRUB?.displayValue).toFixed(2).toString(),
+      USD: Number(balanceUSD?.displayValue).toFixed(2).toString(),
+      IND: Number(balanceINR?.displayValue).toFixed(2).toString(),
     });
   }, [
     balanceRUB?.displayValue,
@@ -102,28 +102,44 @@ const Home = observer(() => {
       <Header />
       <AccountHeader />
       <div className={styles.card}>
-        <ButtonGroup className="mg-20" variant="shadow" fullWidth={true}>
+        <ConnectBlock />
+
+        <ButtonGroup
+          className="mg-20 mg-top-20"
+          variant="shadow"
+          fullWidth={true}
+        >
+          <Button
+            onPress={() => handleNavigation("/transfer")}
+            color="secondary"
+          >
+            Перевести
+          </Button>
           <Button
             onPress={() => handleNavigation("/deposit")}
             color="secondary"
           >
-            Депозит
+            Купить
           </Button>
           <Button
             onPress={() => handleNavigation("/withdraw")}
             color="secondary"
           >
-            Вывод
+            Вывести
           </Button>
           <Button isDisabled color="secondary">
             Обмен
           </Button>
         </ButtonGroup>
-        <h3>Ваш баланс iBDC:</h3>
+        <h3>Ваши токены iBDC:</h3>
         {contractStore.contractsData.map(
           ({ currency, metadata }, index) =>
             metadata.data && (
-              <div key={index} className={styles.nft}>
+              <div
+                onClick={() => handleNavigation(`/transactions/${currency}`)}
+                key={index}
+                className={styles.nft}
+              >
                 <MediaRenderer
                   src={metadata.data.image}
                   alt={metadata.data.name}
@@ -141,7 +157,6 @@ const Home = observer(() => {
               </div>
             )
         )}
-        <ConnectBlock />
       </div>
     </div>
   );

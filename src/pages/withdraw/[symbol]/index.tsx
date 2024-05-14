@@ -4,13 +4,13 @@ import { WithdrawBlock } from "@/components/WithdrawBlock";
 import styles from "@/styles/Home.module.css";
 import { Button, ButtonGroup } from "@nextui-org/button";
 import { useRouter } from "next/router";
-export default function Deposit() {
+export default function Withdraw() {
   const router = useRouter();
   const { symbol } = router.query;
-  // Define contracts with identifiers
-  const currencies = ["RUB", "USD", "IND"];
 
-  const handleNavigation = (url) => router.push(url);
+  const goBack = () => {
+    router.back();
+  };
 
   return (
     <div className={styles.container}>
@@ -18,16 +18,13 @@ export default function Deposit() {
       <AccountHeader />
       <div className={styles.card}>
         <ButtonGroup className="mg-20" variant="shadow" fullWidth={true}>
-          <Button
-            onPress={() => handleNavigation("/withdraw")}
-            color="secondary"
-          >
+          <Button onPress={goBack} color="secondary">
             Назад
           </Button>
         </ButtonGroup>
         <h3>Вывод средств {symbol}i:</h3>
 
-        <WithdrawBlock symbol={symbol} />
+        <WithdrawBlock symbol={symbol?.toString()} />
       </div>
     </div>
   );

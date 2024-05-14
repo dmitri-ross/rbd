@@ -1,14 +1,14 @@
 import { AccountHeader } from "@/components/AccountHeader";
-import { DepositBlock } from "@/components/DepositBlock";
 import { Header } from "@/components/Header";
+import { TransferBlock } from "@/components/TransferBlock";
 import styles from "@/styles/Home.module.css";
 import { Button, ButtonGroup } from "@nextui-org/button";
 import { useRouter } from "next/router";
-export default function Deposit() {
+export default function Transfer() {
   const router = useRouter();
   const { symbol } = router.query;
 
-
+  
   const goBack = () => {
     router.back();
   };
@@ -26,9 +26,9 @@ export default function Deposit() {
             Назад
           </Button>
         </ButtonGroup>
-        <h3>Депозит средств на {symbol}i:</h3>
+        <h3>Перевод средств {symbol}i:</h3>
 
-        <DepositBlock symbol={symbol} />
+        <TransferBlock symbol={symbol?.toString()} />
       </div>
     </div>
   );

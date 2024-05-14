@@ -46,7 +46,7 @@ export default async function handler(
 
     const tokenContract = await sdk.getContract(contractAddresses["RUB"]);
 
-    const amountBigNumber = ethers.utils.parseUnits(amount, 'wei');
+    const amountBigNumber = ethers.utils.parseEther(amount);
 
     const tx = await tokenContract.call("mintTo", [to, amountBigNumber.toString()]);
     

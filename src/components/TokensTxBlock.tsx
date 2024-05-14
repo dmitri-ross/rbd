@@ -3,12 +3,11 @@
 import styles from "@/styles/Home.module.css";
 import shortenAddress from "@/util/formatAddress";
 import { Card, CardBody } from "@nextui-org/react";
-import {
-  useUser
-} from "@thirdweb-dev/react";
+import { useUser } from "@thirdweb-dev/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { contractAddresses, explorerBaseURL } from "../../const/contracts";
+import { ethers } from "ethers";
 
 export default function TokensTxBlock({ symbol }) {
   const [transactions, setTransactions] = useState([]);
@@ -59,7 +58,15 @@ export default function TokensTxBlock({ symbol }) {
                         Дата: {new Date(tx.timeStamp * 1000).toLocaleString()}
                       </p>
                       <p>
-                        Кому: {shortenAddress(isOutgoing ? tx.to : tx.from)}
+                        {!isOutgoing &&
+                        tx.from.toString() ==
+                          ethers.constants.AddressZero.toString()
+                          ? "Депозит с банковского счета"
+                          : isOutgoing &&
+                            tx.from.toString() !=
+                              ethers.constants.AddressZero.toString()
+                          ? `Кому: ${shortenAddress(tx.to)}`
+                          : `От кого: ${shortenAddress(tx.from)}`}
                       </p>
                       <p className={amountColor}>
                         {sign}

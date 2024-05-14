@@ -26,6 +26,10 @@ const Home = observer(() => {
       router.push("/login");
     }
   }, [isLoading, isLoggedIn, router]);
+  const { data: balanceRUB } = useBalance(contractAddresses["RUB"]);
+  const { data: balanceUSD } = useBalance(contractAddresses["USD"]);
+  const { data: balanceINR } = useBalance(contractAddresses["INR"]);
+  
   const contractRUB = useContract(contractAddresses["RUB"]);
   const metadataRUB = useContractMetadata(contractRUB.contract);
 
@@ -35,30 +39,45 @@ const Home = observer(() => {
   const contractIND = useContract(contractAddresses["IND"]);
   const metadataIND = useContractMetadata(contractIND.contract);
 
-  const { data: balanceRUB } = useBalance(contractAddresses["RUB"]);
-  const { data: balanceUSD } = useBalance(contractAddresses["USD"]);
-  const { data: balanceINR } = useBalance(contractAddresses["INR"]);
+ 
+  const [fetchedContracts, setFetchedContracts] = useState([]);
+
+
+  
   const [balance, setBalance] = useState({
     RUB: "0.00",
     USD: "0.00",
     IND: "0.00",
   });
   useEffect(() => {
-    setBalance({
-      RUB: Number(balanceRUB?.displayValue).toFixed(2).toString(),
-      USD: Number(balanceUSD?.displayValue).toFixed(2).toString(),
-      IND: Number(balanceINR?.displayValue).toFixed(2).toString(),
-    });
+    // Function to update balances
+    const fetchBalances = () => {
+      console.log("loading balances");
+      setBalance({
+        RUB: Number(balanceRUB?.displayValue).toFixed(2).toString(),
+        USD: Number(balanceUSD?.displayValue).toFixed(2).toString(),
+        IND: Number(balanceINR?.displayValue).toFixed(2).toString(),
+      });
+      console.log('fetched balances');
+      console.log(balance);
+    };
+
+    // Call fetchBalances initially and set an interval to call it every 5 seconds
+    fetchBalances();
+    const intervalId = setInterval(fetchBalances, 2000);
+
+    // Cleanup function to clear the interval when the component unmounts
+    return () => clearInterval(intervalId);
   }, [
-    balanceRUB?.displayValue,
-    balanceUSD?.displayValue,
-    balanceINR?.displayValue,
+    balanceRUB,
+    balanceUSD,
+    balanceINR,
   ]);
 
-  const [fetchedContracts, setFetchedContracts] = useState([]);
+  
 
   useEffect(() => {
-    console.log(1);
+    console.log("loading contracts");
 
     const contracts = [
       { currency: "RUB", contract: contractRUB, metadata: metadataRUB },
@@ -67,30 +86,17 @@ const Home = observer(() => {
     ];
 
     contractStore.setContracts(contracts);
-    console.log(2);
+    console.log('fetched contracts');
     setFetchedContracts(contracts);
-    console.log(fetchedContracts);
-  }, [contractIND.contract]);
+  }, [contractIND.contract,contractRUB.contract,contractUSD.contract]);
+
+  
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {
       router.push("/login");
     } else if (user?.address) {
-      // contractStore.contractsData.forEach(async ({ currency, contract }) => {
-      //   if (contract.contract?.erc20) {
-      //     try {
-      //       const result = await contract.contract.erc20.balanceOf(
-      //         user.address
-      //       );
-      //       setBalance((prev) => ({
-      //         ...prev,
-      //         [currency]: result.displayValue,
-      //       }));
-      //     } catch (error) {
-      //       console.error(`Failed to fetch the balance for ${currency}`, error);
-      //     }
-      //   }
-      // });
+      
     }
   }, [isLoading, isLoggedIn, user, router, contractStore.contractsData]);
 

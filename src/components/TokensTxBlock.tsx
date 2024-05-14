@@ -3,16 +3,49 @@
 import styles from "@/styles/Home.module.css";
 import shortenAddress from "@/util/formatAddress";
 import { Card, CardBody } from "@nextui-org/react";
-import { useUser } from "@thirdweb-dev/react";
+
+import contractStore from "@/stores/ContractStore";
+import {
+  useUser,
+  useContract,
+  useContractMetadata,
+  useBalance,
+} from "@thirdweb-dev/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { contractAddresses, explorerBaseURL } from "../../const/contracts";
+import {
+  contractAddresses,
+  withdrawContractAddress,
+  explorerBaseURL,
+} from "../../const/contracts";
 import { ethers } from "ethers";
 
 export default function TokensTxBlock({ symbol }) {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user, isLoggedIn, isLoading } = useUser();
+  const contractRUB = useContract(contractAddresses["RUB"]);
+  const metadataRUB = useContractMetadata(contractRUB.contract);
+
+  const contractUSD = useContract(contractAddresses["USD"]);
+  const metadataUSD = useContractMetadata(contractUSD.contract);
+
+  const contractIND = useContract(contractAddresses["IND"]);
+  const metadataIND = useContractMetadata(contractIND.contract);
+
+  useEffect(() => {
+    console.log("loading contracts");
+
+    const contracts = [
+      { currency: "RUB", contract: contractRUB, metadata: metadataRUB },
+      { currency: "USD", contract: contractUSD, metadata: metadataUSD },
+      { currency: "IND", contract: contractIND, metadata: metadataIND },
+    ];
+
+    contractStore.setContracts(contracts);
+    console.log("fetched contracts");
+  }, [contractIND.contract, contractRUB.contract, contractUSD.contract]);
+
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
@@ -58,9 +91,10 @@ export default function TokensTxBlock({ symbol }) {
                         Дата: {new Date(tx.timeStamp * 1000).toLocaleString()}
                       </p>
                       <p>
-                        {!isOutgoing &&
-                        tx.from.toString() ==
-                          ethers.constants.AddressZero.toString()
+                        {tx.to == withdrawContractAddress.toLowerCase()
+                          ? "Вывод на банковский счет"
+                          : tx.from.toString() ==
+                            ethers.constants.AddressZero.toString()
                           ? "Депозит с банковского счета"
                           : isOutgoing &&
                             tx.from.toString() !=

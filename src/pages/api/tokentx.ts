@@ -21,7 +21,7 @@ export default async function handler(req, res) {
         contractaddress: contractAddress,
         address: user.address,
         page: 1,
-        offset: 10,
+        offset: 20,
         sort: 'desc',
         apikey: apiKey
       }
@@ -32,7 +32,7 @@ export default async function handler(req, res) {
       value: (parseInt(tx.value) / Math.pow(10, parseInt(tx.tokenDecimal))).toFixed(2),
       timeStamp: tx.timeStamp 
     }));
-
+    console.log(transactions);
     // Return the parsed transactions
     res.status(200).json(transactions);
   } catch (error) {

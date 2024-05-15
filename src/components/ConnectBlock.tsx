@@ -1,7 +1,7 @@
 import { ConnectWallet } from "@thirdweb-dev/react";
 import styles from "../styles/Header.module.css";
 import { contractAddresses } from "../../const/contracts";
-export const ConnectBlock = ({ symbol = "RUB" }) => {
+export const ConnectBlock = ({ symbol = "RUB" , onlyBalance = false}) => {
 
   
   return (
@@ -33,7 +33,7 @@ export const ConnectBlock = ({ symbol = "RUB" }) => {
       ],
     }}
     theme="dark"
-    className="connect"
+    className={`connect ${onlyBalance ? 'onlyBalance' : 'balance'}`}
   />
   );
 };

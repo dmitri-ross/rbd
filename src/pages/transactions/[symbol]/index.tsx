@@ -12,7 +12,6 @@ export default function Transactions() {
   const router = useRouter();
   const { symbol } = router.query;
 
-
   return (
     <div className={styles.container}>
       <Header />
@@ -20,7 +19,7 @@ export default function Transactions() {
 
       <div className={styles.card}>
         <BackButton />
-        <ConnectBlock symbol={symbol?.toString()} />
+        <ConnectBlock onlyBalance={true} symbol={symbol?.toString()} />
 
         <TopMenu symbol={symbol?.toString()} />
         <h3>Список транзакций {symbol}i:</h3>

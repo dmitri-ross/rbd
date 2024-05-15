@@ -33,7 +33,7 @@ export const ConnectBlock = ({ symbol = "RUB" }) => {
       ],
     }}
     theme="dark"
-    className={styles.connect}
+    className="connect"
   />
   );
 };

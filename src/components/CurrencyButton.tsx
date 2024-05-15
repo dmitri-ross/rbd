@@ -10,7 +10,7 @@ export const CurrencyButton = ({ contract, index, action }) => {
   return (
     <>
       <Button
-        className="dark mg-20 navbutton"
+        className="dark mg-20 navbutton h-50"
         color="default"
         variant="ghost"
         key={index} // Ensure `key` is here

@@ -51,10 +51,13 @@ const Withdraw = observer(() => {
         </h4>
 
         {fetchedContracts.map((contract, index) => (
-          <CurrencyButton key={index} action="withdraw" contract={contract} index={index} />
+          <CurrencyButton
+            key={index}
+            action="withdraw"
+            contract={contract}
+            index={index}
+          />
         ))}
-
-        <ConnectBlock />
       </div>
     </div>
   );

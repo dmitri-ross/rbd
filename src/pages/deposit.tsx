@@ -49,9 +49,13 @@ const Deposit = observer(() => {
         <BackButton />
         <h4 className="mg-20">Выберите валюту для депозита средств на iBDC:</h4>
         {fetchedContracts.map((contract, index) => (
-          <CurrencyButton key={index}  action="deposit" contract={contract} index={index} />
+          <CurrencyButton
+            key={index}
+            action="deposit"
+            contract={contract}
+            index={index}
+          />
         ))}
-        <ConnectBlock />
       </div>
     </div>
   );

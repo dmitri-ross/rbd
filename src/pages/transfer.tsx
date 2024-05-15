@@ -50,9 +50,13 @@ const Transfer = observer(() => {
         </h4>
 
         {fetchedContracts.map((contract, index) => (
-          <CurrencyButton key={index}  action="transfer" contract={contract} index={index} />
+          <CurrencyButton
+            key={index}
+            action="transfer"
+            contract={contract}
+            index={index}
+          />
         ))}
-        <ConnectBlock />
       </div>
     </div>
   );

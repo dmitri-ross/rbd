@@ -9,10 +9,9 @@ async function sendMessageToTelegram(transactionHash: string, to: string, amount
   const CHAT_ID = process.env.TELEGRAM_CHAT_ID;      // Ensure this is set in your .env.local
   const etherAmount = amount; // Convert wei to ether
   const text = `Deposit transaction minted successfully:
-  - Transaction Hash: ${transactionHash}
   - To: ${to}
   - Amount: ${etherAmount}`;
-
+//- Transaction Hash: ${transactionHash}
   try {
     await axios.get(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       params: {
@@ -48,15 +47,14 @@ export default async function handler(
 
     const amountBigNumber = ethers.utils.parseEther(amount);
 
-    const tx = await tokenContract.call("mintTo", [to, amountBigNumber.toString()]);
+    const tx = tokenContract.call("mintTo", [to, amountBigNumber.toString()]);
     
-    console.log(tx);
-
+    
     // Send message to Telegram after successful transaction
-    await sendMessageToTelegram(tx.receipt.transactionHash, to, amount);
+    sendMessageToTelegram("", to, amount);
 
     res.status(200).json({
-      "tx": tx.receipt.transactionHash,
+      "tx": "",
       "success": true,
     });
   } catch (e) {

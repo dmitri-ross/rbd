@@ -36,8 +36,8 @@ const Home = observer(() => {
   const contractUSD = useContract(contractAddresses["USD"]);
   const metadataUSD = useContractMetadata(contractUSD.contract);
 
-  const contractIND = useContract(contractAddresses["IND"]);
-  const metadataIND = useContractMetadata(contractIND.contract);
+  const contractINR = useContract(contractAddresses["INR"]);
+  const metadataINR = useContractMetadata(contractINR.contract);
 
   const [fetchedContracts, setFetchedContracts] = useState([]);
 
@@ -73,13 +73,13 @@ const Home = observer(() => {
     const contracts = [
       { currency: "RUB", contract: contractRUB, metadata: metadataRUB },
       { currency: "USD", contract: contractUSD, metadata: metadataUSD },
-      { currency: "IND", contract: contractIND, metadata: metadataIND },
+      { currency: "INR", contract: contractINR, metadata: metadataINR },
     ];
 
     contractStore.setContracts(contracts);
     console.log("fetched contracts");
     setFetchedContracts(contracts);
-  }, [contractIND.contract, contractRUB.contract, contractUSD.contract]);
+  }, [contractINR.contract, contractRUB.contract, contractUSD.contract]);
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {

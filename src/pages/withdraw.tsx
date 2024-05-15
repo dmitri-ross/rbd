@@ -19,8 +19,8 @@ const Withdraw = observer(() => {
   const contractUSD = useContract(contractAddresses["USD"]);
   const metadataUSD = useContractMetadata(contractUSD.contract);
 
-  const contractIND = useContract(contractAddresses["IND"]);
-  const metadataIND = useContractMetadata(contractIND.contract);
+  const contractINR = useContract(contractAddresses["INR"]);
+  const metadataINR = useContractMetadata(contractINR.contract);
 
   const [fetchedContracts, setFetchedContracts] = useState([]);
 
@@ -30,14 +30,14 @@ const Withdraw = observer(() => {
     const contracts = [
       { currency: "RUB", contract: contractRUB, metadata: metadataRUB },
       { currency: "USD", contract: contractUSD, metadata: metadataUSD },
-      { currency: "IND", contract: contractIND, metadata: metadataIND },
+      { currency: "INR", contract: contractINR, metadata: metadataINR },
     ];
 
     contractStore.setContracts(contracts);
     console.log(2);
     setFetchedContracts(contracts);
     console.log(fetchedContracts);
-  }, [contractIND.contract]);
+  }, [contractINR.contract]);
 
   return (
     <div className={styles.container}>

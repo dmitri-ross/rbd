@@ -6,19 +6,18 @@ import { Card, CardBody } from "@nextui-org/react";
 
 import contractStore from "@/stores/ContractStore";
 import {
-  useUser,
   useContract,
   useContractMetadata,
-  useBalance,
+  useUser
 } from "@thirdweb-dev/react";
 import axios from "axios";
+import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import {
   contractAddresses,
-  withdrawContractAddress,
   explorerBaseURL,
+  withdrawContractAddress,
 } from "../../const/contracts";
-import { ethers } from "ethers";
 
 export default function TokensTxBlock({ symbol }) {
   const [transactions, setTransactions] = useState([]);

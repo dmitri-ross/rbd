@@ -1,16 +1,15 @@
-import { Button, ButtonGroup } from "@nextui-org/button";
-import { observer } from "mobx-react";
-import { useRouter } from "next/router";
-
 import { AccountHeader } from "@/components/AccountHeader";
+import { BackButton } from "@/components/BackButton";
 import { ConnectBlock } from "@/components/ConnectBlock";
+import { CurrencyButton } from "@/components/CurrencyButton";
 import { Header } from "@/components/Header";
 import contractStore from "@/stores/ContractStore";
 import styles from "@/styles/Home.module.css";
 import { useContract, useContractMetadata, useUser } from "@thirdweb-dev/react";
+import { observer } from "mobx-react";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { contractAddresses } from "../../const/contracts";
-import { Breadcrumbs, BreadcrumbItem } from "@nextui-org/react";
 const Withdraw = observer(() => {
   const { user, isLoggedIn, isLoading } = useUser();
   const router = useRouter();
@@ -40,53 +39,20 @@ const Withdraw = observer(() => {
     console.log(fetchedContracts);
   }, [contractIND.contract]);
 
-  const handleNavigation = (url) => {
-    router.push(url);
-  };
-
-  const goBack = () => {
-    router.back();
-  };
-
   return (
     <div className={styles.container}>
       <Header />
       <AccountHeader />
       <div className={styles.card}>
-        <Breadcrumbs className="dark mg-10">
-          <BreadcrumbItem onClick={goBack}>&#60; Назад</BreadcrumbItem>
-        </Breadcrumbs>
-        {/* <ButtonGroup className="mg-20" variant="shadow" fullWidth={true}>
-          <Button
-            onClick={goBack} // Changed from onPress to onClick
-            color="secondary"
-          >
-            Назад
-          </Button>
-        </ButtonGroup> */}
+        <BackButton />
+
         <h4 className="mg-20">
           Выберите валюту для вывода средств на банковский счет:
         </h4>
 
-        {contractStore.contractsData.map(
-          ({ currency, metadata }, index) =>
-            metadata.data && (
-              <Button
-                key={index} // Moved key to Button from inner div
-                onClick={() => handleNavigation(`/withdraw/${currency}`)} // Changed from onPress to onClick
-                className="dark mg-20"
-              >
-                <div className={styles.nft}>
-                  <div className={styles.nftDetails}>
-                    <h4>
-                      {metadata.data.name} ({metadata.data.symbol})
-                    </h4>
-                  </div>
-                  {metadata.isLoading && <p>Loading...</p>}
-                </div>
-              </Button>
-            )
-        )}
+        {fetchedContracts.map((contract, index) => (
+          <CurrencyButton action="withdraw" contract={contract} index={index} />
+        ))}
 
         <ConnectBlock />
       </div>

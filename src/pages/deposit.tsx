@@ -1,5 +1,7 @@
 import { AccountHeader } from "@/components/AccountHeader";
+import { BackButton } from "@/components/BackButton";
 import { ConnectBlock } from "@/components/ConnectBlock";
+import { CurrencyButton } from "@/components/CurrencyButton";
 import { Header } from "@/components/Header";
 import contractStore from "@/stores/ContractStore";
 import styles from "@/styles/Home.module.css";
@@ -39,45 +41,15 @@ const Deposit = observer(() => {
     console.log(fetchedContracts);
   }, [contractIND.contract]);
 
-  const handleNavigation = (url) => {
-    router.push(url);
-  };
-
-  const goBack = () => {
-    router.back();
-  };
-
   return (
     <div className={styles.container}>
       <Header />
       <AccountHeader />
       <div className={styles.card}>
-        {/* <ButtonGroup className="mg-20" variant="shadow" fullWidth={true}>
-          <Button onClick={goBack} color="secondary">
-            Назад
-          </Button>
-        </ButtonGroup> */}
-        <Breadcrumbs className="dark mg-10">
-          <BreadcrumbItem onClick={goBack}>&#60; Назад</BreadcrumbItem>
-        </Breadcrumbs>
-
+        <BackButton />
         <h4 className="mg-20">Выберите валюту для депозита средств на iBDC:</h4>
-        {contractStore.contractsData.map((contract, index) => (
-          <Button
-            key={index} // Ensure `key` is here
-            onClick={() => handleNavigation(`/deposit/${contract.currency}`)}
-            className="dark mg-20"
-          >
-            <div className={styles.nft}>
-              <div className={styles.nftDetails}>
-                <h4>
-                  {contract.metadata.data.name} ({contract.metadata.data.symbol}
-                  )
-                </h4>
-                {contract.metadata.isLoading && <p>Loading...</p>}
-              </div>
-            </div>
-          </Button>
+        {fetchedContracts.map((contract, index) => (
+          <CurrencyButton action="deposit" contract={contract} index={index} />
         ))}
         <ConnectBlock />
       </div>

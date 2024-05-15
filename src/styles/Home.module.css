@@ -41,6 +41,7 @@
   align-items: flex-start;
   margin-top: 30px;
   width: 370px;
+  background: #131418;
 }
 
 .card h3 {
@@ -96,4 +97,7 @@
 
 .amountOut {
   color: rgb(255, 88, 88);
+}
+.rotate45deg{
+  transform: translateY(-10%) rotate(-45deg); 
 }

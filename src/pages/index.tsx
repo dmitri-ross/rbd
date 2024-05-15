@@ -1,17 +1,17 @@
 import { AccountHeader } from "@/components/AccountHeader";
 import { ConnectBlock } from "@/components/ConnectBlock";
+import { TopMenu } from "@/components/TopMenu";
 import { Header } from "@/components/Header";
 import contractStore from "@/stores/ContractStore";
 import styles from "@/styles/Home.module.css";
-import { Button, ButtonGroup } from "@nextui-org/button";
+
 import {
   MediaRenderer,
+  useBalance,
   useContract,
   useContractMetadata,
   useUser,
-  useBalance,
 } from "@thirdweb-dev/react";
-import { Breadcrumbs, BreadcrumbItem } from "@nextui-org/react";
 import { observer } from "mobx-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -29,7 +29,7 @@ const Home = observer(() => {
   const { data: balanceRUB } = useBalance(contractAddresses["RUB"]);
   const { data: balanceUSD } = useBalance(contractAddresses["USD"]);
   const { data: balanceINR } = useBalance(contractAddresses["INR"]);
-  
+
   const contractRUB = useContract(contractAddresses["RUB"]);
   const metadataRUB = useContractMetadata(contractRUB.contract);
 
@@ -39,11 +39,8 @@ const Home = observer(() => {
   const contractIND = useContract(contractAddresses["IND"]);
   const metadataIND = useContractMetadata(contractIND.contract);
 
- 
   const [fetchedContracts, setFetchedContracts] = useState([]);
 
-
-  
   const [balance, setBalance] = useState({
     RUB: "0.00",
     USD: "0.00",
@@ -58,7 +55,7 @@ const Home = observer(() => {
         USD: Number(balanceUSD?.displayValue).toFixed(2).toString(),
         IND: Number(balanceINR?.displayValue).toFixed(2).toString(),
       });
-      console.log('fetched balances');
+      console.log("fetched balances");
       console.log(balance);
     };
 
@@ -68,13 +65,7 @@ const Home = observer(() => {
 
     // Cleanup function to clear the interval when the component unmounts
     return () => clearInterval(intervalId);
-  }, [
-    balanceRUB,
-    balanceUSD,
-    balanceINR,
-  ]);
-
-  
+  }, [balanceRUB, balanceUSD, balanceINR]);
 
   useEffect(() => {
     console.log("loading contracts");
@@ -86,21 +77,18 @@ const Home = observer(() => {
     ];
 
     contractStore.setContracts(contracts);
-    console.log('fetched contracts');
+    console.log("fetched contracts");
     setFetchedContracts(contracts);
-  }, [contractIND.contract,contractRUB.contract,contractUSD.contract]);
-
-  
+  }, [contractIND.contract, contractRUB.contract, contractUSD.contract]);
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {
       router.push("/login");
     } else if (user?.address) {
-      
     }
   }, [isLoading, isLoggedIn, user, router, contractStore.contractsData]);
 
-  const handleNavigation = (url) => {
+ const handleNavigation = (url) => {
     router.push(url);
   };
 
@@ -109,36 +97,8 @@ const Home = observer(() => {
       <Header />
       <AccountHeader />
       <div className={styles.card}>
-        
         <ConnectBlock />
-
-        <ButtonGroup
-          className="mg-20 mg-top-20"
-          variant="shadow"
-          fullWidth={true}
-        >
-          <Button
-            onPress={() => handleNavigation("/transfer")}
-            color="secondary"
-          >
-            Перевести
-          </Button>
-          <Button
-            onPress={() => handleNavigation("/deposit")}
-            color="secondary"
-          >
-            Купить
-          </Button>
-          <Button
-            onPress={() => handleNavigation("/withdraw")}
-            color="secondary"
-          >
-            Вывести
-          </Button>
-          <Button isDisabled color="secondary">
-            Обмен
-          </Button>
-        </ButtonGroup>
+        <TopMenu />
         <h3>Ваши токены iBDC:</h3>
         {contractStore.contractsData.map(
           ({ currency, metadata }, index) =>

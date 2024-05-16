@@ -1,8 +1,8 @@
 .header {
-  display: flex;
+  /* display: flex; */
   justify-content: space-between;
   align-items: center;
-  padding: 20px 40px;
+  padding: 35px 0px 65px 0px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   /* position: absolute; */
   width: 100%;

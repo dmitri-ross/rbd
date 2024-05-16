@@ -86,6 +86,7 @@ h2 {
 .connect img{
   height:48px !important;
   width:48px !important;
+  filter: hue-rotate(258deg) saturate(0.5) brightness(1.9);
 }
 
 .onlyBalance img{

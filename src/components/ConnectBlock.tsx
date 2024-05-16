@@ -6,6 +6,7 @@ export const ConnectBlock = ({ symbol = "RUB" , onlyBalance = false}) => {
   
   return (
     <ConnectWallet
+    modalTitleIconUrl={""}
     hideSwitchToPersonalWallet={true}
     displayBalanceToken={{
       11155111: contractAddresses[symbol],

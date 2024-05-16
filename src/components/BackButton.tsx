@@ -1,6 +1,8 @@
 import { BreadcrumbItem, Breadcrumbs } from "@nextui-org/react";
 import { useRouter } from "next/router";
+import { useTranslation } from "react-i18next";
 export const BackButton = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const goBack = () => {
     router.back();
@@ -24,7 +26,7 @@ export const BackButton = () => {
               d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
             />
           </svg>
-          Назад
+          {t('back')}
         </BreadcrumbItem>
       </Breadcrumbs>
     </>

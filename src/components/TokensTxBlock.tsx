@@ -10,6 +10,7 @@ import {
 import axios from "axios";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 import {
   contractAddresses,
   explorerBaseURL,
@@ -17,6 +18,7 @@ import {
 } from "../../const/contracts";
 
 export default function TokensTxBlock({ symbol }) {
+  const { t } = useTranslation();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useUser();
@@ -64,9 +66,9 @@ export default function TokensTxBlock({ symbol }) {
     }
   }, [symbol]);
 
-  if (loading) return <p>Загрузка транзакций...</p>;
-  if (transactions.length === 0) return <p>Транзакции не проводились</p>;
-  
+  if (loading) return <p>{t('loading')}</p>;
+  if (transactions.length === 0) return <p>{t('noTransactions')}</p>;
+
   return (
     <div>
       <div className="">
@@ -86,21 +88,19 @@ export default function TokensTxBlock({ symbol }) {
                 <CardBody>
                   <div className={styles.nft}>
                     <div className={styles.nftDetails}>
-                      <h4>Перевод</h4>
-                      <p>
-                        Дата: {new Date(tx.timeStamp * 1000).toLocaleString()}
-                      </p>
+                      <h4>{t('transfer')}</h4>
+                      <p>{t('date')}: {new Date(tx.timeStamp * 1000).toLocaleString()}</p>
                       <p>
                         {tx.to === withdrawContractAddress.toLowerCase()
-                          ? "Вывод на банковский счет"
+                          ? t('withdrawToBank')
                           : tx.from.toString() ===
                             ethers.constants.AddressZero.toString()
-                          ? "Депозит с банковского счета"
+                          ? t('depositFromBank')
                           : isOutgoing &&
                             tx.from.toString() !==
                               ethers.constants.AddressZero.toString()
-                          ? `Кому: ${shortenAddress(tx.to)}`
-                          : `От кого: ${shortenAddress(tx.from)}`}
+                          ? t('to', { address: shortenAddress(tx.to) })
+                          : t('from', { address: shortenAddress(tx.from) })}
                       </p>
                       <p className={amountColor}>
                         {sign}

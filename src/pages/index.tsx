@@ -44,7 +44,7 @@ const Home = observer(() => {
   const [balance, setBalance] = useState({
     RUB: "0.00",
     USD: "0.00",
-    IND: "0.00",
+    INR: "0.00",
   });
   useEffect(() => {
     // Function to update balances
@@ -53,7 +53,7 @@ const Home = observer(() => {
       setBalance({
         RUB: Number(balanceRUB?.displayValue).toFixed(2).toString(),
         USD: Number(balanceUSD?.displayValue).toFixed(2).toString(),
-        IND: Number(balanceINR?.displayValue).toFixed(2).toString(),
+        INR: Number(balanceINR?.displayValue).toFixed(2).toString(),
       });
       console.log("fetched balances");
       console.log(balance);

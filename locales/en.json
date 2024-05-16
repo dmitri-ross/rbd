@@ -22,5 +22,9 @@
   "routingNumber": "Routing Number",
   "paymentPurpose": "Payment purpose",
   "creditToAccount": "Credit to digital currency account {address}",
-  "depositCompletion": "Credit will occur within 24 hours."
+  "depositCompletion": "Credit will occur within 24 hours.",
+  "send": "Transfer",
+  "swap": "Swap",
+  "deposit": "Deposit",
+  "withdraw": "Withdraw"
 }

@@ -22,5 +22,9 @@
   "routingNumber": "Routing Number",
   "paymentPurpose": "Назначение платежа",
   "creditToAccount": "Зачисление на счет цифровой валюты {address}",
-  "depositCompletion": "Зачисление происходит в течение 24 часов."
+  "depositCompletion": "Зачисление происходит в течение 24 часов.",
+  "send": "Перевести",
+  "swap": "Обмен",
+  "deposit": "Пополнить",
+  "withdraw": "Вывести"
 }

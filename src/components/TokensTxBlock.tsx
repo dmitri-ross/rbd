@@ -1,9 +1,6 @@
-// components/TokensTxBlock.js
-
 import styles from "@/styles/Home.module.css";
 import shortenAddress from "@/util/formatAddress";
 import { Card, CardBody } from "@nextui-org/react";
-
 import contractStore from "@/stores/ContractStore";
 import {
   useContract,
@@ -22,7 +19,7 @@ import {
 export default function TokensTxBlock({ symbol }) {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user, isLoggedIn, isLoading } = useUser();
+  const { user } = useUser();
   const contractRUB = useContract(contractAddresses["RUB"]);
   const metadataRUB = useContractMetadata(contractRUB.contract);
 
@@ -61,11 +58,15 @@ export default function TokensTxBlock({ symbol }) {
 
     if (symbol) {
       fetchTransactions();
+      const intervalId = setInterval(fetchTransactions, 10000); // Fetch transactions every 10 seconds
+
+      return () => clearInterval(intervalId); // Cleanup interval on component unmount
     }
   }, [symbol]);
 
   if (loading) return <p>Загрузка транзакций...</p>;
-  if (transactions.length == 0) return <p>Транзакции не проводились</p>;
+  if (transactions.length === 0) return <p>Транзакции не проводились</p>;
+  
   return (
     <div>
       <div className="">
@@ -90,13 +91,13 @@ export default function TokensTxBlock({ symbol }) {
                         Дата: {new Date(tx.timeStamp * 1000).toLocaleString()}
                       </p>
                       <p>
-                        {tx.to == withdrawContractAddress.toLowerCase()
+                        {tx.to === withdrawContractAddress.toLowerCase()
                           ? "Вывод на банковский счет"
-                          : tx.from.toString() ==
+                          : tx.from.toString() ===
                             ethers.constants.AddressZero.toString()
                           ? "Депозит с банковского счета"
                           : isOutgoing &&
-                            tx.from.toString() !=
+                            tx.from.toString() !==
                               ethers.constants.AddressZero.toString()
                           ? `Кому: ${shortenAddress(tx.to)}`
                           : `От кого: ${shortenAddress(tx.from)}`}

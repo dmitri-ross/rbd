@@ -28,7 +28,7 @@ export const DepositBlock = (symbol) => {
             <p>{t('bank')}: <i>Сбербанк России</i></p>
             <p>{t('account')}: <i>40702810438250000023</i></p>
             <p>{t('bic')}: <i>044525225</i></p>
-            <p>{t('paymentPurpose')}: <i>{t('creditToAccount', { address: user?.address })}</i></p>
+            <p>{t('paymentPurpose')}: <i>{user?.address}</i></p>
           </>}
 
           {symbol.symbol === 'INR' && <>

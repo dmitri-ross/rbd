@@ -9,8 +9,8 @@ export default async function handler(req, res) {
   const { contractAddress } = req.query;
   
   // Define the API key and base URL for Etherscan (replace 'YourApiKeyToken' with your actual API key)
-  const apiKey = 'J18SQGKCBXZP86DU6X8V88SA7VEB8CPSQQ';
-  const baseURL = 'https://api-sepolia.etherscan.io/api';
+  const apiKey = 'MWBI6FEKWKA82GP5YC8K6TU33WXJ2AZDP4';
+  const baseURL = 'https://api.polygonscan.com/api';
 
   try {
     // Fetch data from Etherscan

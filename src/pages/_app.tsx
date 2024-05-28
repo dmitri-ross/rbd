@@ -13,7 +13,7 @@ import Head from "next/head";
 import { domainName } from "../../const/contracts";
 import russian from "../util/ru";
 import "../styles/globals.css";
-import { Sepolia } from "@thirdweb-dev/chains";
+import { Polygon } from "@thirdweb-dev/chains";
 import { NextUIProvider } from "@nextui-org/react";
 import { I18nextProvider } from "react-i18next";
 import i18n from "../../i18n";
@@ -24,17 +24,23 @@ function App({ Component, pageProps }) {
       <NextUIProvider>
         <ThirdwebProvider
           locale={russian}
-          activeChain={Sepolia}
-          supportedChains={[Sepolia]}
+          activeChain={Polygon}
+          supportedChains={[Polygon]}
           clientId={process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID}
           authConfig={{
             domain: domainName,
             authUrl: "/api/auth",
           }}
           supportedWallets={[
-            // metamaskWallet(),
-            // coinbaseWallet(),
-            // walletConnect(),
+            smartWallet(metamaskWallet(), {
+              factoryAddress: "0xc31aeCC486a5EE5019cD9834191A42e6238733ff",
+              gasless: true,
+            }),
+
+            smartWallet(walletConnect(), {
+              factoryAddress: "0xc31aeCC486a5EE5019cD9834191A42e6238733ff",
+              gasless: true,
+            }),
             // embeddedWallet({
             //   auth: {
             //     options: ["email", "google", "facebook", "apple"],

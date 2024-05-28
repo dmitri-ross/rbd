@@ -79,7 +79,7 @@ const Home = observer(() => {
     contractStore.setContracts(contracts);
     console.log("fetched contracts");
     setFetchedContracts(contracts);
-  }, [contractINR.contract, contractRUB.contract, contractUSD.contract]);
+  }, [balanceRUB]);
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {
@@ -100,7 +100,7 @@ const Home = observer(() => {
         <ConnectBlock />
         <TopMenu />
         <h3>Ваши токены iBDC:</h3>
-        {contractStore.contractsData.map(
+        {fetchedContracts.map(
           ({ currency, metadata }, index) =>
             metadata.data && (
               <div

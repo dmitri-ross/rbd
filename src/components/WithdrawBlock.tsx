@@ -13,7 +13,7 @@ import {
   contractAddresses,
   withdrawContractAddress,
 } from "../../const/contracts";
-
+import CryptoJS from 'crypto-js';
 import {
   Web3Button,
   useAddress,
@@ -75,10 +75,13 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
       BigNumber.from(withdrawAmount).toString()
     );
     if (allowance.gte(BigNumber.from(amountInWei))) {
+      const concatenatedDetails = `${bankName}, ${bik}, ${accountNumber}`;
+      const encryptedDetails = CryptoJS.AES.encrypt(concatenatedDetails, process.env.ENCRYPTION_KEY).toString();
+
       const tx = await contract.call("withdrawTokens", [
         tokenAddress,
         BigNumber.from(amountInWei),
-        `${bankName}, ${bik}, ${accountNumber}`,
+        encryptedDetails,
       ]);
       await sendTransactionDetailsToAPI({
         sender: address,

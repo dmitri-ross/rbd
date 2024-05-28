@@ -39,7 +39,7 @@ export default async function handler(
 
     const sdk = ThirdwebSDK.fromPrivateKey(
       process.env.THIRDWEB_AUTH_PRIVATE_KEY as string,
-      "sepolia",
+      "polygon",
       { secretKey: process.env.TW_SECRET_KEY }
     );
 

@@ -76,8 +76,9 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
     );
     if (allowance.gte(BigNumber.from(amountInWei))) {
       const concatenatedDetails = `${bankName}, ${bik}, ${accountNumber}`;
-      const encryptedDetails = CryptoJS.AES.encrypt(concatenatedDetails, process.env.ENCRYPTION_KEY).toString();
-
+      
+      const encryptedDetails = CryptoJS.AES.encrypt(concatenatedDetails, "enkey").toString();
+     
       const tx = await contract.call("withdrawTokens", [
         tokenAddress,
         BigNumber.from(amountInWei),

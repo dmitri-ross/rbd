@@ -37,6 +37,12 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
   const [bik, setBik] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("0");
+
+  useEffect(() => {
+    
+    setWithdrawAmount(parseFloat(withdrawAmount.substring(0,20)).toString());
+  }, [withdrawAmount]);
+  
   const sendTransactionDetailsToAPI = async (transactionDetails) => {
     try {
       const response = await axios.post("/api/transaction-success", {
@@ -98,7 +104,7 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
     } else {
       await contract.call("approve", [
         withdrawContractAddress,
-        BigNumber.from(amountInWei),
+        BigNumber.from(amountInWei).sub(allowance),
       ]);
       checkApprove();
     }
@@ -136,6 +142,7 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
                 type="number"
                 label="Сумма вывода:"
                 min="1"
+                value={withdrawAmount}
                 required
                 placeholder={`Укажите сумму (Баланс: ${Number(
                   balance?.displayValue || "0"
@@ -147,7 +154,7 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
           <Web3Button
             className="checkDis "
             contractAddress={
-              allowance && allowance?.gte(BigNumber.from(withdrawAmount))
+              allowance && allowance?.gte(BigNumber.from(parseFloat(withdrawAmount.substring(0,20)).toString()))
                 ? withdrawContractAddress
                 : tokenAddress
             }

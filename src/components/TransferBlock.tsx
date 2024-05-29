@@ -8,7 +8,7 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@nextui-org/react";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 
 import {
   Web3Button,
@@ -18,6 +18,7 @@ import {
 } from "@thirdweb-dev/react";
 import { BigNumber, ethers } from "ethers";
 import { contractAddresses } from "../../const/contracts";
+import { set } from "mobx";
 export const TransferBlock = ({ symbol = "RUB" }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -31,15 +32,23 @@ export const TransferBlock = ({ symbol = "RUB" }) => {
   const [to, setToAddress] = useState("");
   const [amount, setAmount] = useState("0");
 
+  useEffect(() => {
+    
+    const pAmount = parseFloat(amount.substring(0,20)).toString();
+    setAmount(pAmount);
+  }, [amount]);
+
   const handleTransfer = async (contract) => {
-    if (!to || BigNumber.from(ethers.utils.parseEther(amount)).lte(0)) {
+    const floatAmount = parseFloat(amount||"0").toString();
+    const amountInWei = BigNumber.from(
+      ethers.utils.parseEther(floatAmount)
+    );
+    if (!to || amountInWei.lte(0)) {
       alert("Заполните все поля!");
       return;
     }
-    const amountInWei = BigNumber.from(
-      ethers.utils.parseEther(amount)
-    ).toString();
-    await contract.call("transfer", [to, BigNumber.from(amountInWei)]);
+    
+    await contract.call("transfer", [to, amountInWei]);
     onOpen();
   };
 
@@ -62,6 +71,7 @@ export const TransferBlock = ({ symbol = "RUB" }) => {
                 type="deciamal"
                 label="Сумма перевода:"
                 min="1"
+                value={amount}
                 required
                 placeholder={`Укажите сумму (Баланс: ${Number(balance?.displayValue||"0").toFixed(2)})`}
                 onValueChange={setAmount}
@@ -73,7 +83,7 @@ export const TransferBlock = ({ symbol = "RUB" }) => {
             contractAddress={tokenAddress}
             action={handleTransfer}
           >
-            {BigNumber.from(ethers.utils.parseEther(amount)).gt(0)
+            {parseFloat(amount)>0 && BigNumber.from(ethers.utils.parseEther(parseFloat(amount.substring(0,20)).toString())).gt(0)
               ? "Перевести"
               : "Введите сумму"}
           </Web3Button>

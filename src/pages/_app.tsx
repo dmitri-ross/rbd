@@ -50,7 +50,7 @@ function App({ Component, pageProps }) {
             smartWallet(
               embeddedWallet({
                 auth: {
-                  options: ["email", "google", "facebook", "apple"],
+                  options: ["email", "google", "facebook"],
                 },
                 recommended: true,
               }),

@@ -80,7 +80,7 @@ export const TransferBlock = ({ symbol = "RUB" }) => {
             />
             <Input
               className="mg-20"
-              type="numver"
+              type="number"
               step="0.01"
               label="Сумма перевода:"
               min="1"

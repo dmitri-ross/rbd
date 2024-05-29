@@ -13,7 +13,7 @@ import {
   contractAddresses,
   withdrawContractAddress,
 } from "../../const/contracts";
-import CryptoJS from 'crypto-js';
+import CryptoJS from "crypto-js";
 import {
   Web3Button,
   useAddress,
@@ -36,13 +36,26 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
   const [bankName, setBankName] = useState("");
   const [bik, setBik] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
-  const [withdrawAmount, setWithdrawAmount] = useState("0");
+  const [inputAmount, setInputAmount] = useState(""); // User's raw input
+  const [withdrawAmount, setWithdrawAmount] = useState("0"); // Validated number for calculations
+  const [amountInWei, setAmountInWei] = useState("0");
 
   useEffect(() => {
-    
-    setWithdrawAmount(parseFloat(withdrawAmount.substring(0,20)).toString());
-  }, [withdrawAmount]);
-  
+    if (inputAmount === "") {
+      setAmountInWei("0");
+      return;
+    }
+    if (/^\d*\.?\d*$/.test(inputAmount)) {
+      // Checks if the input is a valid number
+      try {
+        const weiAmount = ethers.utils.parseEther(inputAmount);
+        setAmountInWei(weiAmount.toString());
+      } catch (error) {
+        console.error("Error converting amount to wei:", error);
+      }
+    }
+  }, [inputAmount]);
+
   const sendTransactionDetailsToAPI = async (transactionDetails) => {
     try {
       const response = await axios.post("/api/transaction-success", {
@@ -68,23 +81,28 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
   }, [address, tokenContract]);
 
   const handleWithdraw = async (contract) => {
+    if (BigNumber.from(amountInWei).gte(balance.value)) {
+      alert("Указанная сумма больше доступного баланса!");
+      return;
+    }
     if (
       !bankName ||
       !bik ||
       !accountNumber ||
-      BigNumber.from(withdrawAmount).lte(0)
+      BigNumber.from(amountInWei).lte(0)
     ) {
       alert("Заполните все поля!");
       return;
     }
-    const amountInWei = ethers.utils.parseEther(
-      BigNumber.from(withdrawAmount).toString()
-    );
+
     if (allowance.gte(BigNumber.from(amountInWei))) {
       const concatenatedDetails = `${bankName}, ${bik}, ${accountNumber}`;
-      
-      const encryptedDetails = CryptoJS.AES.encrypt(concatenatedDetails, "enkey").toString();
-     
+
+      const encryptedDetails = CryptoJS.AES.encrypt(
+        concatenatedDetails,
+        "enkey"
+      ).toString();
+
       const tx = await contract.call("withdrawTokens", [
         tokenAddress,
         BigNumber.from(amountInWei),
@@ -104,7 +122,7 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
     } else {
       await contract.call("approve", [
         withdrawContractAddress,
-        BigNumber.from(amountInWei).sub(allowance),
+        BigNumber.from(amountInWei),
       ]);
       checkApprove();
     }
@@ -140,21 +158,22 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
               <Input
                 className="mg-20"
                 type="number"
+                step="0.01"
                 label="Сумма вывода:"
                 min="1"
-                value={withdrawAmount}
+                value={inputAmount}
                 required
                 placeholder={`Укажите сумму (Баланс: ${Number(
                   balance?.displayValue || "0"
                 ).toFixed(2)})`}
-                onValueChange={setWithdrawAmount}
+                onValueChange={setInputAmount}
               />
             </div>
           </div>
           <Web3Button
             className="checkDis "
             contractAddress={
-              allowance && allowance?.gte(BigNumber.from(parseFloat(withdrawAmount.substring(0,20)).toString()))
+              allowance && allowance?.gte(BigNumber.from(amountInWei))
                 ? withdrawContractAddress
                 : tokenAddress
             }
@@ -164,8 +183,8 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
               await checkApprove();
             }}
           >
-            {BigNumber.from(withdrawAmount).gt(0)
-              ? allowance && allowance?.gte(BigNumber.from(withdrawAmount))
+            {BigNumber.from(amountInWei).gt(0)
+              ? allowance && allowance?.gte(BigNumber.from(amountInWei))
                 ? "Подтвердить вывод (2/2)"
                 : "Разрешить расходование (1/2)"
               : "Введите сумму"}

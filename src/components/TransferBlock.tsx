@@ -9,7 +9,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { useState, useEffect } from "react";
-
+import { useRouter } from "next/router";
 import {
   Web3Button,
   useAddress,
@@ -20,8 +20,8 @@ import { BigNumber, ethers } from "ethers";
 import { contractAddresses } from "../../const/contracts";
 import { set } from "mobx";
 export const TransferBlock = ({ symbol = "RUB" }) => {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const router = useRouter();
   const tokenAddress = contractAddresses[symbol];
 
   const { contract: tokenContract } = useContract(tokenAddress);
@@ -64,7 +64,10 @@ export const TransferBlock = ({ symbol = "RUB" }) => {
     await contract.call("transfer", [to, amountInWei]);
     onOpen();
   };
-
+  const handleCloseModal = () => {
+    onOpenChange();
+    router.push(`/transactions/${symbol}`);
+  };
   return (
     <>
       <>
@@ -102,7 +105,7 @@ export const TransferBlock = ({ symbol = "RUB" }) => {
         </Web3Button>
       </>
 
-      <Modal className="dark" isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal className="dark" isOpen={isOpen} onOpenChange={onOpenChange}  onClose={handleCloseModal}>
         <ModalContent>
           {(onClose) => (
             <>
@@ -113,7 +116,7 @@ export const TransferBlock = ({ symbol = "RUB" }) => {
                 <p>Транзакция успешно отправлена!</p>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="light" onPress={handleCloseModal}>
                   Закрыть
                 </Button>
               </ModalFooter>

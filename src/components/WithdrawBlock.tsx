@@ -21,10 +21,11 @@ import {
   useContract,
 } from "@thirdweb-dev/react";
 import axios from "axios";
+import { useRouter } from "next/router";
 import { BigNumber, ethers } from "ethers";
 export const WithdrawBlock = ({ symbol = "RUB" }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
+  const router = useRouter();
   const tokenAddress = contractAddresses[symbol];
 
   const { contract: tokenContract } = useContract(tokenAddress);
@@ -127,7 +128,10 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
       checkApprove();
     }
   };
-
+  const handleCloseModal = () => {
+    onOpenChange();
+    router.push(`/transactions/${symbol}`);
+  };
   return (
     <>
       {symbol == "RUB" && (
@@ -203,7 +207,7 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
         </div>
       )}
 
-      <Modal className="dark" isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal className="dark" isOpen={isOpen} onOpenChange={onOpenChange} onClose={handleCloseModal}>
         <ModalContent>
           {(onClose) => (
             <>
@@ -216,7 +220,7 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
                 </p>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="light" onPress={handleCloseModal}>
                   Закрыть
                 </Button>
               </ModalFooter>

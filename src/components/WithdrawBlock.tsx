@@ -82,6 +82,7 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
   }, [address, tokenContract]);
 
   const handleWithdraw = async (contract) => {
+    const finputAmount = inputAmount;
     if (BigNumber.from(amountInWei).gte(balance.value)) {
       alert("Указанная сумма больше доступного баланса!");
       return;
@@ -113,7 +114,7 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
         sender: address,
         symbol,
         tokenAddress,
-        amount: withdrawAmount,
+        amount: finputAmount,
         bankName,
         bik,
         accountNumber,

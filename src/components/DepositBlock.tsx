@@ -25,8 +25,8 @@ export const DepositBlock = (symbol) => {
         <CardBody>
           {symbol.symbol === 'RUB' && <>
             <p>{t('bankDetailsRUB')}</p>
-            <p>{t('bank')}: <i>Сбербанк России</i></p>
-            <p>{t('account')}: <i>40702810438250000023</i></p>
+            <p>{t('bank')}: <i> ПАО Сбербанк</i></p>
+            <p>{t('account')}: <i>40702810038000470531</i></p>
             <p>{t('bic')}: <i>044525225</i></p>
             <p>{t('paymentPurpose')}: <i>{user?.address}</i></p>
           </>}

@@ -1,15 +1,10 @@
-import {
-  ConnectWallet,
-  useUser
-} from "@thirdweb-dev/react";
+import { ConnectWallet, useUser } from "@thirdweb-dev/react";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { Header } from "../components/Header";
 import styles from "../styles/Home.module.css";
 
 export default function Login() {
- 
-  
   const router = useRouter();
   const { isLoggedIn } = useUser();
   useEffect(() => {
@@ -22,12 +17,12 @@ export default function Login() {
   return (
     <div className={styles.container}>
       <Header />
-      <h2 className={styles.heading}>Кошелек iBDC (iBank Digital Currency)</h2>
+      <h2 className={styles.heading}>Токенизированные Депозиты</h2>
       <h1 className={styles.h1}>Авторизация</h1>
 
       <p className={styles.explain}>
-        Покупайте и продавайте банковские токены iBDC, используя свой банковский
-        счет.
+        Покупайте, продавайте и обменивайте цифровые активы от доверенных
+        эмитентов.
       </p>
 
       <div className={styles.card}>

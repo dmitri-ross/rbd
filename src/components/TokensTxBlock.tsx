@@ -28,8 +28,8 @@ export default function TokensTxBlock({ symbol }) {
   const contractUSD = useContract(contractAddresses["USD"]);
   const metadataUSD = useContractMetadata(contractUSD.contract);
 
-  const contractINR = useContract(contractAddresses["INR"]);
-  const metadataINR = useContractMetadata(contractINR.contract);
+  const contractCNY = useContract(contractAddresses["CNY"]);
+  const metadataCNY = useContractMetadata(contractCNY.contract);
 
   useEffect(() => {
     console.log("loading contracts");
@@ -37,12 +37,12 @@ export default function TokensTxBlock({ symbol }) {
     const contracts = [
       { currency: "RUB", contract: contractRUB, metadata: metadataRUB },
       { currency: "USD", contract: contractUSD, metadata: metadataUSD },
-      { currency: "INR", contract: contractINR, metadata: metadataINR },
+      { currency: "CNY", contract: contractCNY, metadata: metadataCNY },
     ];
 
     contractStore.setContracts(contracts);
     console.log("fetched contracts");
-  }, [contractINR.contract, contractRUB.contract, contractUSD.contract]);
+  }, [contractCNY.contract, contractRUB.contract, contractUSD.contract]);
 
   useEffect(() => {
     const fetchTransactions = async () => {

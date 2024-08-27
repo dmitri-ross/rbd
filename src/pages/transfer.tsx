@@ -9,7 +9,7 @@ import { useContract, useContractMetadata, useUser } from "@thirdweb-dev/react";
 import { observer } from "mobx-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { contractAddresses } from "../../const/contracts";
+import { contractAddresses, configMetadataUSDT } from "../../const/contracts";
 const Transfer = observer(() => {
   const { user, isLoggedIn, isLoading } = useUser();
   const router = useRouter();
@@ -19,8 +19,11 @@ const Transfer = observer(() => {
   const contractUSD = useContract(contractAddresses["USD"]);
   const metadataUSD = useContractMetadata(contractUSD.contract);
 
-  const contractINR = useContract(contractAddresses["INR"]);
-  const metadataINR = useContractMetadata(contractINR.contract);
+  const contractCNY = useContract(contractAddresses["CNY"]);
+  const metadataCNY = useContractMetadata(contractCNY.contract);
+
+  const contractUSDT = useContract(contractAddresses["USDT"]);
+  const metadataUSDT = configMetadataUSDT;
 
   const [fetchedContracts, setFetchedContracts] = useState([]);
 
@@ -30,14 +33,15 @@ const Transfer = observer(() => {
     const contracts = [
       { currency: "RUB", contract: contractRUB, metadata: metadataRUB },
       { currency: "USD", contract: contractUSD, metadata: metadataUSD },
-      { currency: "INR", contract: contractINR, metadata: metadataINR },
+      { currency: "CNY", contract: contractCNY, metadata: metadataCNY },
+      { currency: "USDT", contract: contractUSDT, metadata: metadataUSDT },
     ];
 
     contractStore.setContracts(contracts);
     console.log(2);
     setFetchedContracts(contracts);
     console.log(fetchedContracts);
-  }, [contractINR.contract]);
+  }, [contractCNY.contract]);
 
   return (
     <div className={styles.container}>

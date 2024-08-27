@@ -15,7 +15,7 @@ import {
 import { observer } from "mobx-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { contractAddresses } from "../../const/contracts";
+import { contractAddresses, configMetadataUSDT } from "../../const/contracts";
 const Home = observer(() => {
   const { user, isLoggedIn, isLoading } = useUser();
   const router = useRouter();
@@ -28,23 +28,31 @@ const Home = observer(() => {
   }, [isLoading, isLoggedIn, router]);
   const { data: balanceRUB } = useBalance(contractAddresses["RUB"]);
   const { data: balanceUSD } = useBalance(contractAddresses["USD"]);
-  const { data: balanceINR } = useBalance(contractAddresses["INR"]);
-
+  const { data: balanceCNY } = useBalance(contractAddresses["CNY"]);
+  const { data: balanceUSDT } = useBalance(contractAddresses["USDT"]);
+  
   const contractRUB = useContract(contractAddresses["RUB"]);
   const metadataRUB = useContractMetadata(contractRUB.contract);
 
   const contractUSD = useContract(contractAddresses["USD"]);
   const metadataUSD = useContractMetadata(contractUSD.contract);
 
-  const contractINR = useContract(contractAddresses["INR"]);
-  const metadataINR = useContractMetadata(contractINR.contract);
+  const contractCNY = useContract(contractAddresses["CNY"]);
+  const metadataCNY = useContractMetadata(contractCNY.contract);
+
+  const contractUSDT = useContract(contractAddresses["USDT"]);
+  //let metadataUSDT = useContractMetadata(contractUSDT.contract);
+
+  
+  let metadataUSDT = configMetadataUSDT
 
   const [fetchedContracts, setFetchedContracts] = useState([]);
 
   const [balance, setBalance] = useState({
     RUB: "0.00",
     USD: "0.00",
-    INR: "0.00",
+    CNY: "0.00",
+    USDT: "0.00",
   });
   useEffect(() => {
     // Function to update balances
@@ -53,7 +61,8 @@ const Home = observer(() => {
       setBalance({
         RUB: Number(balanceRUB?.displayValue).toFixed(2).toString(),
         USD: Number(balanceUSD?.displayValue).toFixed(2).toString(),
-        INR: Number(balanceINR?.displayValue).toFixed(2).toString(),
+        CNY: Number(balanceCNY?.displayValue).toFixed(2).toString(),
+        USDT: Number(balanceUSDT?.displayValue).toFixed(2).toString(),
       });
       console.log("fetched balances");
       console.log(balance);
@@ -65,7 +74,7 @@ const Home = observer(() => {
 
     // Cleanup function to clear the interval when the component unmounts
     return () => clearInterval(intervalId);
-  }, [balanceRUB, balanceUSD, balanceINR]);
+  }, [balanceRUB, balanceUSD, balanceCNY, balanceUSDT]);
 
   useEffect(() => {
     console.log("loading contracts");
@@ -73,7 +82,8 @@ const Home = observer(() => {
     const contracts = [
       { currency: "RUB", contract: contractRUB, metadata: metadataRUB },
       { currency: "USD", contract: contractUSD, metadata: metadataUSD },
-      { currency: "INR", contract: contractINR, metadata: metadataINR },
+      { currency: "CNY", contract: contractCNY, metadata: metadataCNY },
+      { currency: "USDT", contract: contractUSDT, metadata: metadataUSDT },
     ];
 
     contractStore.setContracts(contracts);
@@ -99,7 +109,7 @@ const Home = observer(() => {
       <div className={styles.card}>
         <ConnectBlock />
         <TopMenu />
-        <h3>Ваши токены iBDC:</h3>
+        <h3>Ваши токены StableUnion:</h3>
         {fetchedContracts.map(
           ({ currency, metadata }, index) =>
             metadata.data && (

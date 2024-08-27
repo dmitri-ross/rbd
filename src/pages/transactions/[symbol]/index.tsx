@@ -22,7 +22,7 @@ export default function Transactions() {
         <ConnectBlock onlyBalance={true} symbol={symbol?.toString()} />
 
         <TopMenu symbol={symbol?.toString()} />
-        <h3>Список транзакций {symbol}i:</h3>
+        <h3>Список транзакций {symbol}:</h3>
 
         <TokensTxBlock symbol={symbol} />
       </div>

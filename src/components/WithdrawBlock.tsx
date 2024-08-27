@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import {
   contractAddresses,
   withdrawContractAddress,
+  erc20ABI
 } from "../../const/contracts";
 import CryptoJS from "crypto-js";
 import {
@@ -19,20 +20,82 @@ import {
   useAddress,
   useBalance,
   useContract,
+  useContractWrite,
+  useSDK,
 } from "@thirdweb-dev/react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { BigNumber, ethers } from "ethers";
+
+
+
 export const WithdrawBlock = ({ symbol = "RUB" }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const router = useRouter();
   const tokenAddress = contractAddresses[symbol];
-
-  const { contract: tokenContract } = useContract(tokenAddress);
-
-  const { data: balance } = useBalance(contractAddresses[symbol]);
   const address = useAddress();
+  const sdk = useSDK(); // Получаем SDK из thirdweb
+  const { contract: withdrawContract } = useContract(withdrawContractAddress);
+  const { data: balance } = useBalance(contractAddresses[symbol]);
+
   const [allowance, setAllowance] = useState(BigNumber.from("0"));
+  const [dots, setDots] = useState(""); // Состояние для точек
+  const [tokenContract, setTokenContract] = useState(null); // Состояние для контракта
+
+  // Инициализация контракта через Thirdweb SDK с кастомным ABI
+  useEffect(() => {
+    const initContract = async () => {
+      const contract = await sdk.getContractFromAbi(tokenAddress, erc20ABI);
+      setTokenContract(contract);
+    };
+    if (sdk) {
+      initContract();
+    }
+  }, [sdk, tokenAddress]);
+
+  const fetchAllowance = async () => {
+    try {
+      if (tokenContract) {
+        const result = await tokenContract.call("allowance", [address, withdrawContractAddress]);
+        
+        setAllowance(BigNumber.from(result));
+      }
+    } catch (error) {
+      console.error("Error fetching allowance:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (address && tokenContract) {
+      fetchAllowance();
+    }
+  }, [address, tokenContract]);
+
+  // Хук для вызова функции approve
+  const {
+    mutate: approve,
+    isLoading: isApproving,
+    error: approveError,
+  } = useContractWrite(tokenContract, "approve");
+
+  // Хук для вызова функции withdrawTokens
+  const {
+    mutate: withdrawTokens,
+    isLoading: isWithdrawing,
+    error: withdrawError,
+  } = useContractWrite(withdrawContract, "withdrawTokens");
+
+  useEffect(() => {
+    let interval;
+    if (isApproving || isWithdrawing) {
+      interval = setInterval(() => {
+        setDots((prev) => (prev.length < 3 ? prev + "." : ""));
+      }, 500);
+    } else {
+      setDots("");
+    }
+    return () => clearInterval(interval);
+  }, [isApproving, isWithdrawing]);
 
   const [bankName, setBankName] = useState("");
   const [bik, setBik] = useState("");
@@ -47,10 +110,12 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
       return;
     }
     if (/^\d*\.?\d*$/.test(inputAmount)) {
-      // Checks if the input is a valid number
       try {
         const weiAmount = ethers.utils.parseEther(inputAmount);
         setAmountInWei(weiAmount.toString());
+        
+        // Перезапрашиваем allowance каждый раз при изменении суммы
+        fetchAllowance();
       } catch (error) {
         console.error("Error converting amount to wei:", error);
       }
@@ -67,21 +132,8 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
       console.error("Error sending transaction details:", error);
     }
   };
-  async function checkApprove() {
-    const allowance = await tokenContract?.call("allowance", [
-      address,
-      withdrawContractAddress,
-    ]);
-    console.log(allowance.toString());
-    setAllowance(allowance);
-  }
-  useEffect(() => {
-    if (!tokenContract || !address) return;
 
-    checkApprove();
-  }, [address, tokenContract]);
-
-  const handleWithdraw = async (contract) => {
+  const handleWithdraw = async () => {
     const finputAmount = inputAmount;
     if (BigNumber.from(amountInWei).gte(balance.value)) {
       alert("Указанная сумма больше доступного баланса!");
@@ -105,34 +157,57 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
         "enkey"
       ).toString();
 
-      const tx = await contract.call("withdrawTokens", [
-        tokenAddress,
-        BigNumber.from(amountInWei),
-        encryptedDetails,
-      ]);
-      await sendTransactionDetailsToAPI({
-        sender: address,
-        symbol,
-        tokenAddress,
-        amount: finputAmount,
-        bankName,
-        bik,
-        accountNumber,
-        txHash: tx?.receipt?.transactionHash || "0x",
-      });
-      onOpen();
+      // Вызываем функцию withdrawTokens через хук
+      withdrawTokens(
+        {
+          args: [
+            tokenAddress,
+            BigNumber.from(amountInWei),
+            encryptedDetails,
+          ],
+        },
+        {
+          onSuccess: async (tx) => {
+            await sendTransactionDetailsToAPI({
+              sender: address,
+              symbol,
+              tokenAddress,
+              amount: finputAmount,
+              bankName,
+              bik,
+              accountNumber,
+              txHash: tx?.receipt?.transactionHash || "0x",
+            });
+            onOpen();
+          },
+          onError: (error) => {
+            console.error("Withdraw failed:", error);
+          },
+        }
+      );
     } else {
-      await contract.call("approve", [
-        withdrawContractAddress,
-        BigNumber.from(amountInWei),
-      ]);
-      checkApprove();
+      // Вызываем функцию approve через хук
+      approve(
+        {
+          args: [withdrawContractAddress, amountInWei],
+        },
+        {
+          onSuccess: () => {
+            fetchAllowance();  // Обновляем allowance после успешного approve
+          },
+          onError: (error) => {
+            console.error("Approval failed:", error);
+          },
+        }
+      );
     }
   };
+
   const handleCloseModal = () => {
     onOpenChange();
     router.push(`/transactions/${symbol}`);
   };
+
   return (
     <>
       {symbol == "RUB" && (
@@ -176,19 +251,18 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
             </div>
           </div>
           <Web3Button
-            className="checkDis "
+            className="checkDis"
             contractAddress={
               allowance && allowance?.gte(BigNumber.from(amountInWei))
                 ? withdrawContractAddress
                 : tokenAddress
             }
             action={handleWithdraw}
-            onSuccess={async () => {
-              console.log("Approved");
-              await checkApprove();
-            }}
+            isDisabled={isApproving || isWithdrawing}  // Блокируем кнопку, если происходит approve или withdraw
           >
-            {BigNumber.from(amountInWei).gt(0)
+            {isApproving || isWithdrawing
+              ? `Идет подтверждение транзакции${dots}`  // Текст с меняющимся количеством точек
+              : BigNumber.from(amountInWei).gt(0)
               ? allowance && allowance?.gte(BigNumber.from(amountInWei))
                 ? "Подтвердить вывод (2/2)"
                 : "Разрешить расходование (1/2)"

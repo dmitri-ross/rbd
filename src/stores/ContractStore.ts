@@ -5,7 +5,7 @@ class ContractStore {
   balance = {
     RUB: "0.00",
     USD: "0.00",
-    INR: "0.00",
+    CNY: "0.00",
   };
    
   constructor() {

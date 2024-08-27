@@ -13,7 +13,7 @@
   "depositFunds": "Deposit Funds",
   "depositInstructions": "To deposit funds, please make a bank transfer to the following bank details.",
   "bankDetailsRUB": "Bank details for transferring in rubles:",
-  "bankDetailsINR": "Bank details for transferring in rupees:",
+  "bankDetailsCNY": "Bank details for transferring in rupees:",
   "bankDetailsUSD": "Bank details for transferring in dollars:",
   "bank": "Bank",
   "account": "Account",

@@ -16,7 +16,7 @@ export default function Withdraw() {
       <div className={styles.card}>
       <BackButton />
         
-        <h3>Вывод средств {symbol}i:</h3>
+        <h3>Вывод средств {symbol}:</h3>
 
         <WithdrawBlock symbol={symbol?.toString()} />
       </div>

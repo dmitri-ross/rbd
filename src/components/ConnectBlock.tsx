@@ -25,10 +25,10 @@ export const ConnectBlock = ({ symbol = "RUB" , onlyBalance = false}) => {
           icon: `/usd.png`,
         },
         {
-          address: contractAddresses["INR"],
+          address: contractAddresses["CNY"],
           name: "Digital Rupee",
-          symbol: "INRi",
-          icon: `/inr.png`,
+          symbol: "CNYi",
+          icon: `/CNY.png`,
         },
       ],
     }}

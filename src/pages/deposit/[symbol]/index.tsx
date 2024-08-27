@@ -17,7 +17,7 @@ export default function Deposit() {
       <div className={styles.card}>
         <BackButton />
 
-        <h3>Депозит средств на {symbol}i:</h3>
+        <h3>Депозит средств на {symbol}:</h3>
 
         <DepositBlock symbol={symbol} />
       </div>

@@ -17,7 +17,7 @@ export default function Transfer() {
       <div className={styles.card}>
         <BackButton />
 
-        <h3>Перевод средств {symbol}i:</h3>
+        <h3>Перевод средств {symbol}:</h3>
 
         <TransferBlock symbol={symbol?.toString()} />
       </div>

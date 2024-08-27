@@ -21,8 +21,8 @@ const Deposit = observer(() => {
   const contractUSD = useContract(contractAddresses["USD"]);
   const metadataUSD = useContractMetadata(contractUSD.contract);
 
-  const contractINR = useContract(contractAddresses["INR"]);
-  const metadataINR = useContractMetadata(contractINR.contract);
+  const contractCNY = useContract(contractAddresses["CNY"]);
+  const metadataCNY = useContractMetadata(contractCNY.contract);
 
   const [fetchedContracts, setFetchedContracts] = useState([]);
 
@@ -32,14 +32,14 @@ const Deposit = observer(() => {
     const contracts = [
       { currency: "RUB", contract: contractRUB, metadata: metadataRUB },
       { currency: "USD", contract: contractUSD, metadata: metadataUSD },
-      { currency: "INR", contract: contractINR, metadata: metadataINR },
+      { currency: "CNY", contract: contractCNY, metadata: metadataCNY },
     ];
 
     contractStore.setContracts(contracts);
     console.log(2);
     setFetchedContracts(contracts);
     console.log(fetchedContracts);
-  }, [contractINR.contract]);
+  }, [contractCNY.contract]);
 
   return (
     <div className={styles.container}>
@@ -47,7 +47,7 @@ const Deposit = observer(() => {
       <AccountHeader />
       <div className={styles.card}>
         <BackButton />
-        <h4 className="mg-20">Выберите валюту для депозита средств на iBDC:</h4>
+        <h4 className="mg-20">Выберите валюту для депозита средств на StableUnion:</h4>
         {fetchedContracts.map((contract, index) => (
           <CurrencyButton
             key={index}

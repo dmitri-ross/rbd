@@ -27,7 +27,8 @@ export const { ThirdwebAuthHandler, getUser } = ThirdwebAuth({
         console.log(user);
         return {
           ...userSession,
-          userId: user.id || 0
+          userId: user.id || 0,
+          isApproved: user.is_approved || false
         };
       }
       return {

@@ -46,7 +46,7 @@ h2 {
   font-size: 2rem;
 }
 .mg-20 {
-  margin-bottom: 20px;
+  margin-bottom: 20px !important;
 }
 .mg-10 {
   margin-bottom: 10px;
@@ -101,4 +101,65 @@ h2 {
 }
 .h-50{
   height: 50px;
+}
+.swap-container {
+  width: 100% !important;
+  border-radius: 16px;
+  
+  margin: 0 0;
+}
+
+.swap-input {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.token-input {
+  width: 70%;
+}
+
+.token-select {
+  background: #ffffff;
+  padding: 10px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+}
+
+.swap-arrow {
+  text-align: right;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 10px auto;
+  padding-left: 85%;
+}
+
+.exchange-rate {
+  text-align: center;
+  margin: 10px 0;
+}
+
+.swap-button {
+  width: 100% !important;
+  background-color: #f72585;
+  
+  padding: 10px;
+  border-radius: 12px;
+  font-size: 18px;
+  margin-top: 20px;
+}
+
+.swap-modal .modal-header {
+  text-align: center;
+}
+
+.swap-modal .modal-body {
+  text-align: center;
+}
+
+.swap-modal .modal-footer {
+  justify-content: center;
 }

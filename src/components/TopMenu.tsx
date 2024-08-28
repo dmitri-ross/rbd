@@ -1,21 +1,31 @@
 import styles from "../styles/Home.module.css";
-import { Button, ButtonGroup } from "@nextui-org/button";
+import { Button } from "@nextui-org/button";
 import { useRouter } from "next/router";
 import { useTranslation } from 'react-i18next';
+import { useAddress } from "@thirdweb-dev/react"; // Importing the hook to get the user's address
+
 export const TopMenu = ({ symbol = "" }) => {
   const router = useRouter();
   const { t } = useTranslation();
+  const address = useAddress(); // Fetching the user's address
+
   const handleNavigation = (url) => {
     router.push(url);
   };
+
+  const isUSDT = symbol === "USDT";
+
+  // All buttons are disabled if the address is not available
+  const isDisabled = !address;
 
   return (
     <>
       <div className="flex flex-wrap gap-4 items-center ">
         <Button
+          isDisabled={isDisabled}
           className="dark mg-top-20 w-150 navbutton"
           onPress={() =>
-            handleNavigation(`/transfer${symbol != "" ? "/" + symbol : ""}`)
+            handleNavigation(`/transfer${symbol ? "/" + symbol : ""}`)
           }
           color="default"
           variant="ghost"
@@ -39,9 +49,9 @@ export const TopMenu = ({ symbol = "" }) => {
         </Button>
 
         <Button
-          isDisabled
-          className="dark mg-top-20 w-150 navbutton "
-          onPress={() => handleNavigation("/exchange")}
+          isDisabled={isDisabled}
+          className="dark mg-top-20 w-150 navbutton"
+          onPress={() => handleNavigation(`/swap`)}
           color="default"
           variant="ghost"
         >
@@ -65,9 +75,10 @@ export const TopMenu = ({ symbol = "" }) => {
         </Button>
 
         <Button
-          className="dark  w-150 navbutton  mg-20"
+          isDisabled={isDisabled || isUSDT}
+          className="dark w-150 navbutton mg-20"
           onPress={() =>
-            handleNavigation(`/deposit${symbol != "" ? "/" + symbol : ""}`)
+            handleNavigation(`/deposit${symbol ? "/" + symbol : ""}`)
           }
           color="default"
           variant="ghost"
@@ -90,9 +101,10 @@ export const TopMenu = ({ symbol = "" }) => {
         </Button>
 
         <Button
+          isDisabled={isDisabled || isUSDT}
           className="dark w-150 navbutton mg-20"
           onPress={() =>
-            handleNavigation(`/withdraw${symbol != "" ? "/" + symbol : ""}`)
+            handleNavigation(`/withdraw${symbol ? "/" + symbol : ""}`)
           }
           color="default"
           variant="ghost"
@@ -116,33 +128,6 @@ export const TopMenu = ({ symbol = "" }) => {
           {t('withdraw')}
         </Button>
       </div>
-      {/* <ButtonGroup
-          className="mg-20 mg-top-20"
-          variant="shadow"
-          fullWidth={true}
-        >
-          <Button
-            onPress={() => handleNavigation("/transfer")}
-            color="secondary"
-          >
-            Перевести
-          </Button>
-          <Button
-            onPress={() => handleNavigation("/deposit")}
-            color="secondary"
-          >
-            Купить
-          </Button>
-          <Button
-            onPress={() => handleNavigation("/withdraw")}
-            color="secondary"
-          >
-            Вывести
-          </Button>
-          <Button isDisabled color="secondary">
-            Обмен
-          </Button>
-        </ButtonGroup> */}
     </>
   );
 };

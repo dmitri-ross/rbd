@@ -5,7 +5,7 @@ import contractStore from "@/stores/ContractStore";
 import {
   useContract,
   useContractMetadata,
-  useUser
+  useUser,
 } from "@thirdweb-dev/react";
 import axios from "axios";
 import { ethers } from "ethers";
@@ -15,6 +15,7 @@ import {
   contractAddresses,
   explorerBaseURL,
   withdrawContractAddress,
+  tokenSwapAddress,  // Import the swap contract address
 } from "../../const/contracts";
 
 export default function TokensTxBlock({ symbol }) {
@@ -78,6 +79,21 @@ export default function TokensTxBlock({ symbol }) {
           const sign = isOutgoing ? "-" : "+";
           const amountColor = isOutgoing ? styles.amountOut : styles.amountIn;
 
+          // Determine the transaction type based on the contract address involved
+          const transactionType =
+            tx.to === withdrawContractAddress.toLowerCase()
+              ? "Вывод на банковский счет"
+              : tx.to === tokenSwapAddress.toLowerCase() || tx.from === tokenSwapAddress.toLowerCase()
+              ? "Обмен"
+              : tx.from.toString() ===
+                ethers.constants.AddressZero.toString()
+              ? "Депозит с банковского счета"
+              : isOutgoing &&
+                tx.from.toString() !==
+                  ethers.constants.AddressZero.toString()
+              ? t('to', { address: shortenAddress(tx.to) })
+              : t('from', { address: shortenAddress(tx.from) });
+
           return (
             <a
               key={tx.hash}
@@ -90,18 +106,7 @@ export default function TokensTxBlock({ symbol }) {
                     <div className={styles.nftDetails}>
                       <h4>{t('transfer')}</h4>
                       <p>{t('date')}: {new Date(tx.timeStamp * 1000).toLocaleString()}</p>
-                      <p>
-                        {tx.to === withdrawContractAddress.toLowerCase()
-                          ? t('withdrawToBank')
-                          : tx.from.toString() ===
-                            ethers.constants.AddressZero.toString()
-                          ? t('depositFromBank')
-                          : isOutgoing &&
-                            tx.from.toString() !==
-                              ethers.constants.AddressZero.toString()
-                          ? t('to', { address: shortenAddress(tx.to) })
-                          : t('from', { address: shortenAddress(tx.from) })}
-                      </p>
+                      <p>{transactionType}</p>
                       <p className={amountColor}>
                         {sign}
                         {parseFloat(tx.value).toFixed(2)} {tx.tokenSymbol}

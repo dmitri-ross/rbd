@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import {
   contractAddresses,
   withdrawContractAddress,
-  erc20ABI
+  erc20ABI,
 } from "../../const/contracts";
 import CryptoJS from "crypto-js";
 import {
@@ -22,12 +22,11 @@ import {
   useContract,
   useContractWrite,
   useSDK,
+  useUser,
 } from "@thirdweb-dev/react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { BigNumber, ethers } from "ethers";
-
-
 
 export const WithdrawBlock = ({ symbol = "RUB" }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -56,8 +55,11 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
   const fetchAllowance = async () => {
     try {
       if (tokenContract) {
-        const result = await tokenContract.call("allowance", [address, withdrawContractAddress]);
-        
+        const result = await tokenContract.call("allowance", [
+          address,
+          withdrawContractAddress,
+        ]);
+
         setAllowance(BigNumber.from(result));
       }
     } catch (error) {
@@ -113,7 +115,7 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
       try {
         const weiAmount = ethers.utils.parseEther(inputAmount);
         setAmountInWei(weiAmount.toString());
-        
+
         // Перезапрашиваем allowance каждый раз при изменении суммы
         fetchAllowance();
       } catch (error) {
@@ -160,11 +162,7 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
       // Вызываем функцию withdrawTokens через хук
       withdrawTokens(
         {
-          args: [
-            tokenAddress,
-            BigNumber.from(amountInWei),
-            encryptedDetails,
-          ],
+          args: [tokenAddress, BigNumber.from(amountInWei), encryptedDetails],
         },
         {
           onSuccess: async (tx) => {
@@ -193,7 +191,7 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
         },
         {
           onSuccess: () => {
-            fetchAllowance();  // Обновляем allowance после успешного approve
+            fetchAllowance(); // Обновляем allowance после успешного approve
           },
           onError: (error) => {
             console.error("Approval failed:", error);
@@ -208,9 +206,21 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
     router.push(`/transactions/${symbol}`);
   };
 
+  const { user } = useUser();
+  const [userId, setUserId] = useState("");
+  const [isApproved, setUserIsApproved] = useState(false);
+  useEffect(() => {
+    const userDatawithData: any = user;
+    if (userDatawithData && userDatawithData.data) {
+      setUserId(userDatawithData.data.userId);
+      setUserIsApproved(userDatawithData.data.isApproved);
+      console.log(symbol, isApproved);
+    }
+  }, [user]);
+
   return (
     <>
-      {symbol == "RUB" && (
+      {symbol == "RUB" && isApproved && (
         <>
           <div className="w-full flex flex-col gap-4">
             <div className=" dark flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
@@ -258,10 +268,10 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
                 : tokenAddress
             }
             action={handleWithdraw}
-            isDisabled={isApproving || isWithdrawing}  // Блокируем кнопку, если происходит approve или withdraw
+            isDisabled={isApproving || isWithdrawing} // Блокируем кнопку, если происходит approve или withdraw
           >
             {isApproving || isWithdrawing
-              ? `Идет подтверждение транзакции${dots}`  // Текст с меняющимся количеством точек
+              ? `Идет подтверждение транзакции${dots}` // Текст с меняющимся количеством точек
               : BigNumber.from(amountInWei).gt(0)
               ? allowance && allowance?.gte(BigNumber.from(amountInWei))
                 ? "Подтвердить вывод (2/2)"
@@ -271,7 +281,21 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
         </>
       )}
 
-      {symbol != "RUB" && (
+      {!isApproved && (
+        <div className="w-full flex flex-col gap-4">
+          <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+            <div>
+              <h4 className="danger">
+                Платформа работает в тестовом режиме. Для получения возможности
+                пополнения счета обратитесь к администратору
+                admin@stableunion.org.
+              </h4>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {symbol != "RUB" && isApproved && (
         <div className="w-full flex flex-col gap-4">
           <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
             <p>
@@ -282,7 +306,12 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
         </div>
       )}
 
-      <Modal className="dark" isOpen={isOpen} onOpenChange={onOpenChange} onClose={handleCloseModal}>
+      <Modal
+        className="dark"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        onClose={handleCloseModal}
+      >
         <ModalContent>
           {(onClose) => (
             <>
@@ -295,7 +324,11 @@ export const WithdrawBlock = ({ symbol = "RUB" }) => {
                 </p>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={handleCloseModal}>
+                <Button
+                  color="danger"
+                  variant="light"
+                  onPress={handleCloseModal}
+                >
                   Закрыть
                 </Button>
               </ModalFooter>

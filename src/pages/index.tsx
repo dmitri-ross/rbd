@@ -16,7 +16,6 @@ import { observer } from "mobx-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { contractAddresses, configMetadataUSDT } from "../../const/contracts";
-
 const Home = observer(() => {
   const { user, isLoggedIn, isLoading } = useUser();
   const router = useRouter();
@@ -27,12 +26,11 @@ const Home = observer(() => {
       router.push("/login");
     }
   }, [isLoading, isLoggedIn, router]);
-
-  const { data: balanceRUB, isLoading: isLoadingRUB } = useBalance(contractAddresses["RUB"]);
-  const { data: balanceUSD, isLoading: isLoadingUSD } = useBalance(contractAddresses["USD"]);
-  const { data: balanceCNY, isLoading: isLoadingCNY } = useBalance(contractAddresses["CNY"]);
-  const { data: balanceUSDT, isLoading: isLoadingUSDT } = useBalance(contractAddresses["USDT"]);
-
+  const { data: balanceRUB } = useBalance(contractAddresses["RUB"]);
+  const { data: balanceUSD } = useBalance(contractAddresses["USD"]);
+  const { data: balanceCNY } = useBalance(contractAddresses["CNY"]);
+  const { data: balanceUSDT } = useBalance(contractAddresses["USDT"]);
+  
   const contractRUB = useContract(contractAddresses["RUB"]);
   const metadataRUB = useContractMetadata(contractRUB.contract);
 
@@ -43,46 +41,64 @@ const Home = observer(() => {
   const metadataCNY = useContractMetadata(contractCNY.contract);
 
   const contractUSDT = useContract(contractAddresses["USDT"]);
-  let metadataUSDT = configMetadataUSDT;
+  //let metadataUSDT = useContractMetadata(contractUSDT.contract);
+
+  
+  let metadataUSDT = configMetadataUSDT
 
   const [fetchedContracts, setFetchedContracts] = useState([]);
 
   const [balance, setBalance] = useState({
-    RUB: "Загрузка...",
-    USD: "Загрузка...",
-    CNY: "Загрузка...",
-    USDT: "Загрузка...",
+    RUB: "0.00",
+    USD: "0.00",
+    CNY: "0.00",
+    USDT: "0.00",
   });
-
-  const allBalancesLoaded = !isLoadingRUB && !isLoadingUSD && !isLoadingCNY && !isLoadingUSDT;
-  const allMetadataLoaded = metadataRUB?.data && metadataUSD?.data && metadataCNY?.data && metadataUSDT;
-
   useEffect(() => {
-    if (allBalancesLoaded) {
+    // Function to update balances
+    const fetchBalances = () => {
+      console.log("loading balances");
       setBalance({
-        RUB: Number(balanceRUB?.displayValue).toFixed(2).toString() || "0.00",
-        USD: Number(balanceUSD?.displayValue).toFixed(2).toString() || "0.00",
-        CNY: Number(balanceCNY?.displayValue).toFixed(2).toString() || "0.00",
-        USDT: Number(balanceUSDT?.displayValue).toFixed(2).toString() || "0.00",
+        RUB: Number(balanceRUB?.displayValue).toFixed(2).toString(),
+        USD: Number(balanceUSD?.displayValue).toFixed(2).toString(),
+        CNY: Number(balanceCNY?.displayValue).toFixed(2).toString(),
+        USDT: Number(balanceUSDT?.displayValue).toFixed(2).toString(),
       });
-    }
-  }, [balanceRUB, balanceUSD, balanceCNY, balanceUSDT, isLoadingRUB, isLoadingUSD, isLoadingCNY, isLoadingUSDT]);
+      console.log("fetched balances");
+      console.log(balance);
+    };
+
+    // Call fetchBalances initially and set an interval to call it every 5 seconds
+    fetchBalances();
+    const intervalId = setInterval(fetchBalances, 2000);
+
+    // Cleanup function to clear the interval when the component unmounts
+    return () => clearInterval(intervalId);
+  }, [balanceRUB, balanceUSD, balanceCNY, balanceUSDT]);
 
   useEffect(() => {
-    if (allMetadataLoaded) {
-      const contracts = [
-        { currency: "RUB", contract: contractRUB, metadata: metadataRUB },
-        { currency: "USD", contract: contractUSD, metadata: metadataUSD },
-        { currency: "CNY", contract: contractCNY, metadata: metadataCNY },
-        { currency: "USDT", contract: contractUSDT, metadata: metadataUSDT },
-      ];
+    console.log("loading contracts");
 
-      contractStore.setContracts(contracts);
-      setFetchedContracts(contracts);
+    const contracts = [
+      { currency: "RUB", contract: contractRUB, metadata: metadataRUB },
+      { currency: "USD", contract: contractUSD, metadata: metadataUSD },
+      { currency: "CNY", contract: contractCNY, metadata: metadataCNY },
+      { currency: "USDT", contract: contractUSDT, metadata: metadataUSDT },
+    ];
+
+    contractStore.setContracts(contracts);
+    console.log("fetched contracts");
+    setFetchedContracts(contracts);
+  }, [balanceRUB]);
+
+  useEffect(() => {
+    if (!isLoading && !isLoggedIn) {
+      router.push("/login");
+    } else if (user?.address) {
     }
-  }, [metadataRUB, metadataUSD, metadataCNY, metadataUSDT]);
+  }, [isLoading, isLoggedIn, user, router, contractStore.contractsData]);
 
-  const handleNavigation = (url) => {
+ const handleNavigation = (url) => {
     router.push(url);
   };
 
@@ -94,33 +110,30 @@ const Home = observer(() => {
         <ConnectBlock />
         <TopMenu />
         <h3>Ваши токены StableUnion:</h3>
-        {!allBalancesLoaded || !allMetadataLoaded ? (
-          <p>Загрузка данных...</p>
-        ) : (
-          fetchedContracts.map(
-            ({ currency, metadata }, index) =>
-              metadata.data && (
-                <div
-                  onClick={() => handleNavigation(`/transactions/${currency}`)}
-                  key={index}
-                  className={styles.nft}
-                >
-                  <MediaRenderer
-                    src={metadata.data.image}
-                    alt={metadata.data.name}
-                    width="70px"
-                    height="70px"
-                  />
-                  <div className={styles.nftDetails}>
-                    <h4>{metadata.data.name}</h4>
-                    <p>
-                      {balance[currency]} {metadata.data.symbol}
-                    </p>
-                  </div>
-                  {metadata.isLoading && <p>Loading...</p>}
+        {fetchedContracts.map(
+          ({ currency, metadata }, index) =>
+            metadata.data && (
+              <div
+                onClick={() => handleNavigation(`/transactions/${currency}`)}
+                key={index}
+                className={styles.nft}
+              >
+                <MediaRenderer
+                  src={metadata.data.image}
+                  alt={metadata.data.name}
+                  width="70px"
+                  height="70px"
+                />
+                <div className={styles.nftDetails}>
+                  <h4>{metadata.data.name}</h4>
+                  <p>{metadata.data.description}</p>
+                  <p>
+                    {balance[currency]} {metadata.data.symbol}
+                  </p>
                 </div>
-              )
-          )
+                {metadata.isLoading && <p>Loading...</p>}
+              </div>
+            )
         )}
       </div>
     </div>

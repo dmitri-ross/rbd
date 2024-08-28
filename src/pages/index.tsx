@@ -49,10 +49,10 @@ const Home = observer(() => {
   const [fetchedContracts, setFetchedContracts] = useState([]);
 
   const [balance, setBalance] = useState({
-    RUB: "0.00",
-    USD: "0.00",
-    CNY: "0.00",
-    USDT: "0.00",
+    RUB: "Загрузка...",
+    USD: "Загрузка...",
+    CNY: "Загрузка...",
+    USDT: "Загрузка...",
   });
   useEffect(() => {
     // Function to update balances
@@ -112,7 +112,7 @@ const Home = observer(() => {
         <h3>Ваши токены StableUnion:</h3>
         {fetchedContracts.map(
           ({ currency, metadata }, index) =>
-            metadata.data && (
+            !isNaN(balance[currency]) && metadata.data && (
               <div
                 onClick={() => handleNavigation(`/transactions/${currency}`)}
                 key={index}
@@ -126,7 +126,7 @@ const Home = observer(() => {
                 />
                 <div className={styles.nftDetails}>
                   <h4>{metadata.data.name}</h4>
-                  <p>{metadata.data.description}</p>
+                  
                   <p>
                     {balance[currency]} {metadata.data.symbol}
                   </p>

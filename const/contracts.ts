@@ -1,6 +1,14 @@
 // Replace this with your contract address
-export const contractAddresses = { "RUB": "0x470faE9851ec77E9FbF9038B78175776BF21E579", "USD": "0x4530978Afd7B2301C0E4d444359044fb55c87c1c", "CNY": "0x8B9a37aB6EDccb579b68666268050Eec14B6166A", "USDT": "0xc2132d05d31c914a87c6611c10748aeb04b58e8f" }
+export const contractAddresses = { "RUB": "0x470faE9851ec77E9FbF9038B78175776BF21E579", "USD": "0x4530978Afd7B2301C0E4d444359044fb55c87c1c", "CNY": "0x8B9a37aB6EDccb579b68666268050Eec14B6166A", "USDT": "0xc2132d05d31c914a87c6611c10748aeb04b58e8f", "DAI": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",  "USDC":"0x2791bca1f2de4661ed88a30c99a7a9449aa84174"}
 export const configMetadataUSDT = { data: { image: "/usdt.png", symbol: "USDT", description: "USD Tether-Polygon", name: "USD Tether-Polygon" }, decimals: "6" }
+
+
+
+export const configMetadataUSDC = { data: { image: "/usdc.png", symbol: "USDC", description: "USDC-Polygon", name: "USDC-Polygon" }, decimals: "6" }
+
+
+export const configMetadataDAI = { data: { image: "/dai.png", symbol: "DAI", description: "DAI-Polygon", name: "DAI-Polygon" }, decimals: "6" }
+
 
 
 

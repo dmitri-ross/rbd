@@ -13,7 +13,7 @@ export const TopMenu = ({ symbol = "" }) => {
     router.push(url);
   };
 
-  const isUSDT = symbol === "USDT";
+  const isUSDT = symbol === "USDTT";
 
   // All buttons are disabled if the address is not available
   const isDisabled = !address;

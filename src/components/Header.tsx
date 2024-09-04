@@ -10,8 +10,8 @@ export const Header = () => {
         <Image
           src="/logo.png"
           alt="logo"
-          width={135}
-          height={22}
+          width={155}
+          height={33}
           className={styles.logo}
         />
       </Link>

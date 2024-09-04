@@ -9,39 +9,37 @@ import { useContract, useContractMetadata, useUser } from "@thirdweb-dev/react";
 import { observer } from "mobx-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { contractAddresses, configMetadataUSDT } from "../../const/contracts";
+import { contractAddresses, configMetadataUSDT, configMetadataUSDC, configMetadataDAI } from "../../const/contracts";
+
 const Transfer = observer(() => {
   const { user, isLoggedIn, isLoading } = useUser();
   const router = useRouter();
+
   const contractRUB = useContract(contractAddresses["RUB"]);
   const metadataRUB = useContractMetadata(contractRUB.contract);
-
-  const contractUSD = useContract(contractAddresses["USD"]);
-  const metadataUSD = useContractMetadata(contractUSD.contract);
-
-  const contractCNY = useContract(contractAddresses["CNY"]);
-  const metadataCNY = useContractMetadata(contractCNY.contract);
 
   const contractUSDT = useContract(contractAddresses["USDT"]);
   const metadataUSDT = configMetadataUSDT;
 
+  const contractUSDC = useContract(contractAddresses["USDC"]);
+  const metadataUSDC = configMetadataUSDC;
+
+  const contractDAI = useContract(contractAddresses["DAI"]);
+  const metadataDAI = configMetadataDAI;
+
   const [fetchedContracts, setFetchedContracts] = useState([]);
 
   useEffect(() => {
-    console.log(1);
-
     const contracts = [
       { currency: "RUB", contract: contractRUB, metadata: metadataRUB },
-      { currency: "USD", contract: contractUSD, metadata: metadataUSD },
-      { currency: "CNY", contract: contractCNY, metadata: metadataCNY },
       { currency: "USDT", contract: contractUSDT, metadata: metadataUSDT },
+      { currency: "USDC", contract: contractUSDC, metadata: metadataUSDC },
+      { currency: "DAI", contract: contractDAI, metadata: metadataDAI },
     ];
 
     contractStore.setContracts(contracts);
-    console.log(2);
     setFetchedContracts(contracts);
-    console.log(fetchedContracts);
-  }, [contractCNY.contract]);
+  }, [contractRUB.contract, contractUSDT.contract, contractUSDC.contract, contractDAI.contract]);
 
   return (
     <div className={styles.container}>
@@ -53,14 +51,31 @@ const Transfer = observer(() => {
           Выберите валюту для перевода средств на другой кошелек:
         </h4>
 
-        {fetchedContracts.map((contract, index) => (
-          <CurrencyButton
-            key={index}
-            action="transfer"
-            contract={contract}
-            index={index}
-          />
-        ))}
+        {/* Раздел для ИЦП */}
+        <h3>Токены ИЦП:</h3>
+        {fetchedContracts
+          .filter(({ currency }) => ["USDT", "USDC", "DAI"].includes(currency))
+          .map((contract, index) => (
+            <CurrencyButton
+              key={index}
+              action="transfer"
+              contract={contract}
+              index={index}
+            />
+          ))}
+
+        {/* Раздел для Токенизированных Депозитов */}
+        <h3>Токенизированные Депозиты:</h3>
+        {fetchedContracts
+          .filter(({ currency }) => ["RUB"].includes(currency))
+          .map((contract, index) => (
+            <CurrencyButton
+              key={index}
+              action="transfer"
+              contract={contract}
+              index={index}
+            />
+          ))}
       </div>
     </div>
   );

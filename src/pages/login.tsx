@@ -17,12 +17,11 @@ export default function Login() {
   return (
     <div className={styles.container}>
       <Header />
-      <h2 className={styles.heading}>Токенизированные Депозиты</h2>
+      <h2 className={styles.heading}> Ваш кошелек РОСДАО</h2>
       <h1 className={styles.h1}>Авторизация</h1>
 
       <p className={styles.explain}>
-        Покупайте, продавайте и обменивайте цифровые активы от доверенных
-        эмитентов.
+     Покупайте, продавайте и управляйте цифровыми активами на публичных реестрах.
       </p>
 
       <div className={styles.card}>

@@ -12,7 +12,7 @@
   font-weight: 700;
   font-size: 1rem;
   color: transparent;
-  background: linear-gradient(90.35deg, #BBFFF4 3.41%, #8affed 100%);
+  background: linear-gradient(359deg, #1171ae 3.41%, #9cb7d9 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -46,7 +46,7 @@
 
 .card h3 {
   margin: 0px;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
 }
 

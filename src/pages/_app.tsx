@@ -63,7 +63,7 @@ function App({ Component, pageProps }) {
           ]}
         >
           <Head>
-            <title>Кошелек StableUnion v0.2</title>
+            <title>Кошелек РОСДАО v0.2</title>
             <meta
               name="viewport"
               content="width=device-width, initial-scale=1.0"

@@ -30,8 +30,8 @@ import {
     const address = useAddress();
     const sdk = useSDK();
   
-    const tokenOptions = ["RUB", "USD", "CNY", "USDT"];
-    const tokenSymbols = { RUB: "RUBi", USD: "USDi", CNY: "CNYi", USDT: "USDT" };
+    const tokenOptions = ["RUB", "USDC", "DAI", "USDT"];
+    const tokenSymbols = { RUB: "RUBi", USDC: "USDC", DAI: "DAI", USDT: "USDT" };
     const [fromToken, setFromToken] = useState<string>("USDT");
     const [toToken, setToToken] = useState<string>("RUB");
     const [inputAmount, setInputAmount] = useState<string>("");

@@ -19,13 +19,13 @@ export const createUser = async (address) => {
 };
 
 export const findUser = async (address) => {
-  const text = 'SELECT * FROM users WHERE wallet_address = $1';
+  const text = 'SELECT * FROM users WHERE LOWER(wallet_address) = LOWER( $1); ';
   const values = [address];
- 
+
   try {
     const res = await query(text, values);
     console.log(res.rows);
-    
+
     return res.rows[0];
   } catch (err) {
     console.error('Error finding user:', err);

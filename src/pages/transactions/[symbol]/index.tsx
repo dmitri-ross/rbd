@@ -1,4 +1,4 @@
-// pages/transactions.js
+// pages/transactions.tsx
 
 import { AccountHeader } from "@/components/AccountHeader";
 import { BackButton } from "@/components/BackButton";
@@ -8,6 +8,7 @@ import TokensTxBlock from "@/components/TokensTxBlock";
 import { TopMenu } from "@/components/TopMenu";
 import styles from "@/styles/Home.module.css";
 import { useRouter } from "next/router";
+
 export default function Transactions() {
   const router = useRouter();
   const { symbol } = router.query;
@@ -24,7 +25,7 @@ export default function Transactions() {
         <TopMenu symbol={symbol?.toString()} />
         <h3>Список транзакций {symbol}:</h3>
 
-        <TokensTxBlock symbol={symbol} />
+        <TokensTxBlock symbol={symbol as string} />
       </div>
     </div>
   );

@@ -101,3 +101,23 @@
 .rotate45deg{
   transform: translateY(-10%) rotate(-45deg); 
 }
+
+.paymentOrderTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.paymentOrderTable td {
+  border: 1px solid #000;
+  padding: 8px;
+}
+
+.paymentOrderTable td strong {
+  display: block;
+}
+
+.receipt h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}

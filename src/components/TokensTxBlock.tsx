@@ -1,3 +1,5 @@
+// components/TokensTxBlock.tsx
+
 import styles from "@/styles/Home.module.css";
 import shortenAddress from "@/util/formatAddress";
 import { Card, CardBody } from "@nextui-org/react";
@@ -17,10 +19,11 @@ import {
   withdrawContractAddress,
   tokenSwapAddress,  // Import the swap contract address
 } from "../../const/contracts";
+import Link from 'next/link';
 
-export default function TokensTxBlock({ symbol }) {
+export default function TokensTxBlock({ symbol }: { symbol: string }) {
   const { t } = useTranslation();
-  const [transactions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useUser();
   const contractRUB = useContract(contractAddresses["RUB"]);
@@ -85,9 +88,6 @@ export default function TokensTxBlock({ symbol }) {
               ? "Вывод на банковский счет"
               : tx.to === tokenSwapAddress.toLowerCase() || tx.from === tokenSwapAddress.toLowerCase()
               ? "Обмен"
-              : tx.from.toString() ===
-                ethers.constants.AddressZero.toString()
-              ? "Депозит с банковского счета"
               : isOutgoing &&
                 tx.from.toString() !==
                   ethers.constants.AddressZero.toString()
@@ -95,10 +95,10 @@ export default function TokensTxBlock({ symbol }) {
               : t('from', { address: shortenAddress(tx.from) });
 
           return (
-            <a
-              key={tx.hash}
+            <Link
               target="_blank"
-              href={`${explorerBaseURL}${tx.hash}`}
+              key={tx.hash}
+              href={`/api/transaction/${tx.hash}`}
             >
               <Card className="dark mg-top-20 w-320" fullWidth={true}>
                 <CardBody>
@@ -115,7 +115,7 @@ export default function TokensTxBlock({ symbol }) {
                   </div>
                 </CardBody>
               </Card>
-            </a>
+            </Link>
           );
         })}
       </div>

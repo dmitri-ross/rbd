@@ -10,7 +10,7 @@ export const BackButton = () => {
 
   return (
     <>
-      <Breadcrumbs className="dark mg-10">
+      <Breadcrumbs className="light mg-10">
         <BreadcrumbItem onClick={goBack}>
           <svg
             xmlns="http://www.w3.org/2000/svg"

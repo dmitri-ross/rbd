@@ -1,0 +1,104 @@
+/* styles/Transfer.module.css */
+
+/* Container Styles */
+.container {
+    /* max-width: 800px; */
+    margin: 20px auto;
+    padding: 40px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .container h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2f3542;
+    margin-bottom: 20px;
+  }
+  
+  /* Form Styles */
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .inputField {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .inputField label {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: #2f3542;
+  }
+  
+  .inputField input {
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #2f3542;
+  }
+  
+  /* Button Styles */
+  .transferButton {
+    margin-top: 20px;
+    width: 100%;
+    padding: 15px;
+    background-color: #003366;
+    border: none;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .transferButton:hover {
+    background-color: #005b99;
+  }
+  
+  /* Modal Styles */
+  .modalHeader {
+    background-image: linear-gradient(to right, #003366, #005b99);
+    color: #ffffff;
+    position: initial;
+    background-color:initial;
+    background-image: linear-gradient(to right, #003366, #005b99);
+    color:#fff
+  }
+  
+  .modalBody {
+    font-size: 16px;
+    color: #2f3542;
+  }
+  
+  .modalFooter button {
+    background-color: #003366;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  .modalFooter button:hover {
+    background-color: #005b99;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .container {
+      padding: 20px;
+    }
+  
+    .form {
+      gap: 15px;
+    }
+  }
+  

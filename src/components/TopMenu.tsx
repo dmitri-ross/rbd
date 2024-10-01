@@ -23,7 +23,7 @@ export const TopMenu = ({ symbol = "" }) => {
       <div className="flex flex-wrap gap-4 items-center ">
         <Button
           isDisabled={isDisabled}
-          className="dark mg-top-20 w-150 navbutton"
+          className="light mg-top-20 w-150 navbutton"
           onPress={() =>
             handleNavigation(`/transfer${symbol ? "/" + symbol : ""}`)
           }
@@ -50,7 +50,7 @@ export const TopMenu = ({ symbol = "" }) => {
 
         <Button
           isDisabled={isDisabled}
-          className="dark mg-top-20 w-150 navbutton"
+          className="light mg-top-20 w-150 navbutton"
           onPress={() => handleNavigation(`/swap`)}
           color="default"
           variant="ghost"
@@ -76,7 +76,7 @@ export const TopMenu = ({ symbol = "" }) => {
 
         <Button
           isDisabled={isDisabled || isUSDT}
-          className="dark w-150 navbutton mg-20"
+          className="light w-150 navbutton mg-20"
           onPress={() =>
             handleNavigation(`/deposit${symbol ? "/" + symbol : ""}`)
           }
@@ -102,7 +102,7 @@ export const TopMenu = ({ symbol = "" }) => {
 
         <Button
           isDisabled={isDisabled || isUSDT}
-          className="dark w-150 navbutton mg-20"
+          className="light w-150 navbutton mg-20"
           onPress={() =>
             handleNavigation(`/withdraw${symbol ? "/" + symbol : ""}`)
           }

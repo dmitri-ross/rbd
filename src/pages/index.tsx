@@ -1,10 +1,7 @@
-import { AccountHeader } from "@/components/AccountHeader";
-import { ConnectBlock } from "@/components/ConnectBlock";
-import { TopMenu } from "@/components/TopMenu";
-import { Header } from "@/components/Header";
-import contractStore from "@/stores/ContractStore";
-import styles from "@/styles/Home.module.css";
+// pages/index.tsx
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import {
   MediaRenderer,
   useBalance,
@@ -12,15 +9,22 @@ import {
   useContractMetadata,
   useUser,
 } from "@thirdweb-dev/react";
-import { observer } from "mobx-react";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { contractAddresses, configMetadataUSDT , configMetadataUSDC, configMetadataDAI} from "../../const/contracts";
+import { observer } from "mobx-react-lite";
+import contractStore from "@/stores/ContractStore";
+import {
+  contractAddresses,
+  configMetadataUSDT,
+  configMetadataUSDC,
+  configMetadataDAI,
+} from "../../const/contracts";
+import styles from "../styles/Home.module.css";
+import Link from "next/link";
+import Image from "next/image";
 
 const Home = observer(() => {
   const { user, isLoggedIn, isLoading } = useUser();
   const router = useRouter();
-
+  const [organizationName, setorganizationName] = useState("");
   useEffect(() => {
     // Redirect logic
     if (!isLoading && !isLoggedIn) {
@@ -28,27 +32,34 @@ const Home = observer(() => {
     }
   }, [isLoading, isLoggedIn, router]);
 
+  useEffect(() => {
+    const UserData: any = user;
+    if (UserData?.data) {
+      setorganizationName(UserData.data?.organizationName);
+    }
+  }, [user]);
+
   // Define balances
   const { data: balanceRUB } = useBalance(contractAddresses["RUB"]);
   const { data: balanceUSDT } = useBalance(contractAddresses["USDT"]);
   const { data: balanceUSDC } = useBalance(contractAddresses["USDC"]);
   const { data: balanceDAI } = useBalance(contractAddresses["DAI"]);
-  
-  // Contract and metadata for RUB tokens
+
+  // Contracts and metadata
   const contractRUB = useContract(contractAddresses["RUB"]);
-  const metadataRUB = useContractMetadata(contractRUB.contract);
+  const { data: metadataRUB } = useContractMetadata(contractRUB.contract);
 
   const contractUSDT = useContract(contractAddresses["USDT"]);
-  const metadataUSDT = configMetadataUSDT;
+  const { data: metadataUSDT }  = configMetadataUSDT;
 
-  const contractUSDC = useContract(contractAddresses["USDС"]);
-  const metadataUSDC = configMetadataUSDC;
+  const contractUSDC = useContract(contractAddresses["USDC"]);
+  const { data: metadataUSDC } = configMetadataUSDC;
 
   const contractDAI = useContract(contractAddresses["DAI"]);
-  const metadataDAI = configMetadataDAI;
+  const { data: metadataDAI }  = configMetadataDAI;
 
-  const [fetchedContracts, setFetchedContracts] = useState([]);
-  const [balance, setBalance] = useState({
+  const [fetchedContracts, setFetchedContracts] = useState<any[]>([]);
+  const [balance, setBalance] = useState<any>({
     RUB: "Загрузка...",
     USDT: "Загрузка...",
     USDC: "Загрузка...",
@@ -59,10 +70,18 @@ const Home = observer(() => {
     // Fetch balances
     const fetchBalances = () => {
       setBalance({
-        RUB: Number(balanceRUB?.displayValue).toFixed(2).toString(),
-        USDT: Number(balanceUSDT?.displayValue).toFixed(2).toString(),
-        USDC: Number(balanceUSDC?.displayValue).toFixed(2).toString(),
-        DAI: Number(balanceDAI?.displayValue).toFixed(2).toString(),
+        RUB: balanceRUB?.displayValue
+          ? Number(balanceRUB.displayValue).toFixed(2)
+          : "0.00",
+        USDT: balanceUSDT?.displayValue
+          ? Number(balanceUSDT.displayValue).toFixed(2)
+          : "0.00",
+        USDC: balanceUSDC?.displayValue
+          ? Number(balanceUSDC.displayValue).toFixed(2)
+          : "0.00",
+        DAI: balanceDAI?.displayValue
+          ? Number(balanceDAI.displayValue).toFixed(2)
+          : "0.00",
       });
     };
 
@@ -70,7 +89,7 @@ const Home = observer(() => {
     const intervalId = setInterval(fetchBalances, 2000);
 
     return () => clearInterval(intervalId);
-  }, [balanceRUB, balanceUSDT, balanceUSDC, balanceDAI, balanceRUB]);
+  }, [balanceRUB, balanceUSDT, balanceUSDC, balanceDAI]);
 
   useEffect(() => {
     const contracts = [
@@ -80,72 +99,136 @@ const Home = observer(() => {
       { currency: "DAI", contract: contractDAI, metadata: metadataDAI },
     ];
     contractStore.setContracts(contracts);
+    
     setFetchedContracts(contracts);
-  }, [balanceRUB]);
+    console.log(contracts);
+    console.log(user);
+  }, [metadataRUB]);
 
-  const handleNavigation = (url) => {
+  const handleNavigation = (url: string) => {
     router.push(url);
   };
 
+  // Calculate total RUBi balance
+  const totalRUBiBalance = balance["RUB"];
+
   return (
-    <div className={styles.container}>
-      <Header />
-      <AccountHeader />
-      <div className={styles.card}>
-        <ConnectBlock />
-        <TopMenu />
-
-        {/* Section for ИЦП */}
-        <h3>Токены ИЦП:</h3>
-        {fetchedContracts
-          .filter(({ currency }) => ["USDT", "USDC", "DAI"].includes(currency))
-          .map(({ currency, metadata }, index) => (
-            !isNaN(balance[currency]) && metadata.data && (
-              <div
-                onClick={() => handleNavigation(`/transactions/${currency}`)}
-                key={index}
-                className={styles.nft}
-              >
-                <MediaRenderer
-                  src={metadata.data.image}
-                  alt={metadata.data.name}
-                  width="70px"
-                  height="70px"
-                />
-                <div className={styles.nftDetails}>
-                  <h4>{metadata.data.name}</h4>
-                  <p>{balance[currency]} {metadata.data.symbol}</p>
-                </div>
-              </div>
-            )
-        ))}
-
-        {/* Section for Токенизированные депозиты */}
-        <h3>Токенизированные Депозиты:</h3>
-        {fetchedContracts
-          .filter(({ currency }) => ["RUB"].includes(currency))
-          .map(({ currency, metadata }, index) => (
-            !isNaN(balance[currency]) && metadata.data && (
-              <div
-                onClick={() => handleNavigation(`/transactions/${currency}`)}
-                key={index}
-                className={styles.nft}
-              >
-                <MediaRenderer
-                  src={metadata.data.image}
-                  alt={metadata.data.name}
-                  width="70px"
-                  height="70px"
-                />
-                <div className={styles.nftDetails}>
-                  <h4>{metadata.data.name}</h4>
-                  <p>{balance[currency]} {metadata.data.symbol}</p>
-                </div>
-              </div>
-            )
-        ))}
+    <>
+      {/* Main Content */}
+      <div className="dashboard-header">
+        <h1>Главная</h1>
       </div>
-    </div>
+
+      <div className="wallet-card">
+        <div className="wallet-info">
+          <div className="wallet-details">
+            <span className="company-name">{organizationName}</span>
+            <span className="balance">{totalRUBiBalance} RUBi</span>
+          </div>
+          <div className="wallet-actions">
+            <button onClick={() => handleNavigation("/withdraw/RUB")}>
+              Новый Платеж
+            </button>
+            <button onClick={() => handleNavigation("/swap")}>
+              Обмен ИЦП
+            </button>
+            <button onClick={() => handleNavigation("/deposit/RUB")}>
+              Пополнить Счет
+            </button>
+            <button onClick={() => handleNavigation("/withdraw/RUB?self=true")}>
+              Вывести Средства
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="accounts">
+        
+        <h2>Счета Компании:</h2>
+        <div className="account-list">
+          {/* RUB Account */}
+          {fetchedContracts
+            .filter(({ currency }) => currency === "RUB")
+            .map(({ currency, metadata }, index) => (
+              <div
+                onClick={() => handleNavigation(`/transactions/${currency}`)}
+                key={index}
+                className="account"
+              >
+                <i className="fas fa-ruble-sign account-icon"></i>
+                <span>
+                  {metadata?.name} ({metadata?.symbol})
+                </span>
+                <span className="amount">
+                  {balance[currency]} {metadata?.symbol}
+                </span>
+              </div>
+            ))}
+            </div>
+            
+          <h2 className="mb-50">ИЦП Компании:</h2>
+          <div className="account-list">
+          {/* USDT Account */}
+          {fetchedContracts
+            .filter(({ currency }) => currency === "USDT")
+            .map(({ currency, metadata }, index) => (
+              <div
+                onClick={() => handleNavigation(`/transactions/${currency}`)}
+                key={index}
+                className="account"
+              >
+                <i className="fas fa-dollar-sign account-icon"></i>
+                <span>
+                  {metadata?.name} ({metadata?.symbol})
+                </span>
+                <span className="amount">
+                  {balance[currency]} {metadata?.symbol}
+                </span>
+              </div>
+            ))}
+
+          {/* USDC Account */}
+          {fetchedContracts
+            .filter(({ currency }) => currency === "USDC")
+            .map(({ currency, metadata }, index) => (
+              <div
+                onClick={() => handleNavigation(`/transactions/${currency}`)}
+                key={index}
+                className="account"
+              >
+                <i className="fas fa-dollar-sign account-icon"></i>
+                <span>
+                  {metadata?.name} ({metadata?.symbol})
+                </span>
+                <span className="amount">
+                  {balance[currency]} {metadata?.symbol}
+                </span>
+              </div>
+            ))}
+
+          {/* DAI Account */}
+          {fetchedContracts
+            .filter(({ currency }) => currency === "DAI")
+            .map(({ currency, metadata }, index) => (
+              <div
+                onClick={() => handleNavigation(`/transactions/${currency}`)}
+                key={index}
+                className="account"
+              >
+                <i className="fas fa-dollar-sign account-icon"></i>
+                <span>
+                  {metadata?.name} ({metadata?.symbol})
+                </span>
+                <span className="amount">
+                  {balance[currency]} {metadata?.symbol}
+                </span>
+              </div>
+            ))}
+        </div>
+      </div>
+
+      {/* You can add deposits and investments sections similarly if needed */}
+    </>
   );
 });
 

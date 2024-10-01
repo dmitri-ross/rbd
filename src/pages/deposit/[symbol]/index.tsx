@@ -1,26 +1,29 @@
-import { AccountHeader } from "@/components/AccountHeader";
-import { BackButton } from "@/components/BackButton";
-import { DepositBlock } from "@/components/DepositBlock";
-import { Header } from "@/components/Header";
-import styles from "@/styles/Home.module.css";
+// pages/deposit.tsx
+
 import { useRouter } from "next/router";
+import { useEffect } from "react";
+import { useUser } from "@thirdweb-dev/react";
+import DepositBlock from "@/components/DepositBlock";
+
 export default function Deposit() {
   const router = useRouter();
   const { symbol } = router.query;
+  const { isLoggedIn, isLoading } = useUser();
 
-  
+  useEffect(() => {
+    // Redirect if not logged in
+    if (!isLoading && !isLoggedIn) {
+      router.push("/login");
+    }
+  }, [isLoading, isLoggedIn, router]);
 
   return (
-    <div className={styles.container}>
-      <Header />
-      <AccountHeader />
-      <div className={styles.card}>
-        <BackButton />
-
-        <h3>Депозит средств на {symbol}:</h3>
-
-        <DepositBlock symbol={symbol} />
+    <>
+      <div className="dashboard-header">
+        <h1>Депозит средств на {symbol}</h1>
       </div>
-    </div>
+
+      <DepositBlock symbol={symbol} />
+    </>
   );
 }

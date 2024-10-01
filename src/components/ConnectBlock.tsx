@@ -32,7 +32,7 @@ export const ConnectBlock = ({ symbol = "RUB" , onlyBalance = false}) => {
         },
       ],
     }}
-    theme="dark"
+    theme="light"
     className={`connect ${onlyBalance ? 'onlyBalance' : 'balance'}`}
   />
   );

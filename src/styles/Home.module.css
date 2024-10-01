@@ -27,7 +27,7 @@
 
 .explain {
   font-size: 1rem;
-  color: #bbbbbc;
+  color: #6e6e6e;;
   /* margin-top: 1rem; */
   text-align: center;
 }
@@ -121,3 +121,215 @@
   text-align: center;
   margin-bottom: 20px;
 }
+/* styles/Home.module.css */
+
+/* Global Styles (if any) */
+
+/* Login Page Styles */
+.loginContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ece9e6, #ffffff);
+  padding: 20px;
+}
+
+.loginBox {
+  background-color: #ffffff;
+  padding: 40px 50px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.logoLink {
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.logoImage {
+  transition: transform 0.3s ease;
+}
+
+.logoImage:hover {
+  transform: scale(1.05);
+}
+
+.loginHeading {
+  font-size: 20px;
+  font-weight: 500;
+  color: #555555;
+  margin-bottom: 10px;
+}
+
+.loginTitle {
+  font-size: 28px;
+  font-weight: 700;
+  color: #003366;
+  margin-bottom: 20px;
+}
+
+.loginDescription {
+  font-size: 16px;
+  color: #666666;
+  margin-bottom: 30px;
+  line-height: 1.5;
+}
+
+.loginCard {
+  margin-bottom: 30px;
+}
+
+.connectButton {
+  width: 100%;
+  padding: 12px 0;
+  background-color: #003366;
+  color: #ffffff !important;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.connectButton:hover {
+  background-color: #005b99;
+  transform: translateY(-2px);
+}
+
+.loginFooter {
+  font-size: 14px;
+  color: #888888;
+}
+
+.termsLink,
+.privacyLink {
+  color: #005b99;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.termsLink:hover,
+.privacyLink:hover {
+  color: #003366;
+}
+
+/* Responsive Styles */
+@media (max-width: 480px) {
+  .loginBox {
+    padding: 30px 20px;
+  }
+
+  .loginTitle {
+    font-size: 24px;
+  }
+
+  .loginDescription {
+    font-size: 14px;
+  }
+
+  .connectButton {
+    font-size: 14px;
+    padding: 10px 0;
+  }
+
+  .loginFooter {
+    font-size: 12px;
+  }
+}
+/* styles/Home.module.css */
+
+/* Existing styles... */
+
+/* Menu Item Styles */
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 16px;
+  border-radius: 8px;
+  transition: background-color 0.2s, transform 0.2s;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  background-color: transparent;
+  border: none;
+}
+
+.menu-item i {
+  margin-right: 15px;
+  font-size: 18px;
+  width: 20px; /* To align icons */
+}
+
+.menu-item:hover,
+.menu-item.active {
+  background-color: #1c86ee;
+  transform: translateY(-2px);
+}
+
+/* Ensure buttons inside sidebar look like links */
+.sidebar button.menu-item {
+  background: none;
+}
+
+/* Close Button Styles */
+.close-button {
+  display: none;
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 24px;
+  cursor: pointer;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+
+@media (max-width: 768px) {
+  .close-button {
+    display: block;
+  }
+
+  .sidebar ul {
+    padding-top: 60px; /* Space for close button */
+  }
+}
+
+/* Download Button Styles in Transactions Table (for consistency) */
+.download-button {
+  background-color: #003366;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #fff;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.download-button:hover {
+  background-color: #005b99;
+}
+
+/* Adjust other existing styles as needed */

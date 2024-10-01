@@ -1,52 +1,18 @@
 // components/TokensTxBlock.tsx
 
-import styles from "@/styles/Home.module.css";
-import shortenAddress from "@/util/formatAddress";
-import { Card, CardBody } from "@nextui-org/react";
-import contractStore from "@/stores/ContractStore";
-import {
-  useContract,
-  useContractMetadata,
-  useUser,
-} from "@thirdweb-dev/react";
-import axios from "axios";
-import { ethers } from "ethers";
 import { useEffect, useState } from "react";
-import { useTranslation } from 'react-i18next';
+import { useUser } from "@thirdweb-dev/react";
+import axios from "axios";
 import {
   contractAddresses,
-  explorerBaseURL,
   withdrawContractAddress,
-  tokenSwapAddress,  // Import the swap contract address
+  tokenSwapAddress,
 } from "../../const/contracts";
-import Link from 'next/link';
 
-export default function TokensTxBlock({ symbol }: { symbol: string }) {
-  const { t } = useTranslation();
+const TokensTxBlock = ({ symbol }: { symbol: string }) => {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useUser();
-  const contractRUB = useContract(contractAddresses["RUB"]);
-  const metadataRUB = useContractMetadata(contractRUB.contract);
-
-  const contractUSD = useContract(contractAddresses["USD"]);
-  const metadataUSD = useContractMetadata(contractUSD.contract);
-
-  const contractCNY = useContract(contractAddresses["CNY"]);
-  const metadataCNY = useContractMetadata(contractCNY.contract);
-
-  useEffect(() => {
-    console.log("loading contracts");
-
-    const contracts = [
-      { currency: "RUB", contract: contractRUB, metadata: metadataRUB },
-      { currency: "USD", contract: contractUSD, metadata: metadataUSD },
-      { currency: "CNY", contract: contractCNY, metadata: metadataCNY },
-    ];
-
-    contractStore.setContracts(contracts);
-    console.log("fetched contracts");
-  }, [contractCNY.contract, contractRUB.contract, contractUSD.contract]);
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -70,55 +36,106 @@ export default function TokensTxBlock({ symbol }: { symbol: string }) {
     }
   }, [symbol]);
 
-  if (loading) return <p>{t('loading')}</p>;
-  if (transactions.length === 0) return <p>{t('noTransactions')}</p>;
+  if (loading) return <p>Загрузка...</p>;
+  if (transactions.length === 0) return <p>Нет транзакций.</p>;
 
   return (
-    <div>
-      <div className="">
-        {transactions.map((tx) => {
-          const isOutgoing =
-            tx.from.toLowerCase() === user?.address.toLowerCase();
-          const sign = isOutgoing ? "-" : "+";
-          const amountColor = isOutgoing ? styles.amountOut : styles.amountIn;
+    <div className="transactions-list">
+      {/* Add a wrapper div with class 'table-responsive' */}
+      <div className="table-responsive">
+        <table className="transactions-table">
+          <thead>
+            <tr>
+              <th>Дата</th>
+              <th>Тип транзакции</th>
+              <th>От кого</th>
+              <th>Кому</th>
+              <th>Сумма</th>
+              <th>Статус</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody>
+            {transactions.map((tx) => {
+              const userAddress = user?.address.toLowerCase();
+              const fromAddress = tx.from.toLowerCase();
+              const toAddress = tx.to.toLowerCase();
 
-          // Determine the transaction type based on the contract address involved
-          const transactionType =
-            tx.to === withdrawContractAddress.toLowerCase()
-              ? "Вывод на банковский счет"
-              : tx.to === tokenSwapAddress.toLowerCase() || tx.from === tokenSwapAddress.toLowerCase()
-              ? "Обмен"
-              : isOutgoing &&
-                tx.from.toString() !==
-                  ethers.constants.AddressZero.toString()
-              ? t('to', { address: shortenAddress(tx.to) })
-              : t('from', { address: shortenAddress(tx.from) });
+              const isOutgoing = fromAddress === userAddress;
+              const isIncoming = toAddress === userAddress;
 
-          return (
-            <Link
-              target="_blank"
-              key={tx.hash}
-              href={`/api/transaction/${tx.hash}`}
-            >
-              <Card className="dark mg-top-20 w-320" fullWidth={true}>
-                <CardBody>
-                  <div className={styles.nft}>
-                    <div className={styles.nftDetails}>
-                      <h4>{t('transfer')}</h4>
-                      <p>{t('date')}: {new Date(tx.timeStamp * 1000).toLocaleString()}</p>
-                      <p>{transactionType}</p>
-                      <p className={amountColor}>
-                        {sign}
-                        {parseFloat(tx.value).toFixed(2)} {tx.tokenSymbol}
-                      </p>
-                    </div>
-                  </div>
-                </CardBody>
-              </Card>
-            </Link>
-          );
-        })}
+              const fromLabel = fromAddress === userAddress ? "Я" : fromAddress;
+              const toLabel = toAddress === userAddress ? "Я" : toAddress;
+
+              const sign = isOutgoing ? "-" : "+";
+              const amountClass = isOutgoing ? "amount-out" : "amount-in";
+
+              // Determine the transaction type
+              let transactionType = "";
+
+              if (tx.to === withdrawContractAddress.toLowerCase()) {
+                transactionType = "Вывод на банковский счет";
+              } else if (
+                tx.to === tokenSwapAddress.toLowerCase() ||
+                tx.from === tokenSwapAddress.toLowerCase()
+              ) {
+                transactionType = "Обмен";
+              } else if (isOutgoing) {
+                transactionType = "Перевод";
+              } else if (isIncoming) {
+                transactionType = "Поступление";
+              } else {
+                transactionType = "Транзакция";
+              }
+
+              // Transaction status (assuming all transactions are completed)
+              const status = "Завершено";
+
+              // URL for downloading the payment order
+              const paymentOrderUrl = `/api/transaction/${tx.hash}`;
+
+              // Shorten addresses for display
+              const shortenAddress = (address: string) =>
+                address.slice(0, 6) + "..." + address.slice(-4);
+
+              return (
+                <tr key={tx.hash}>
+                  <td>{new Date(tx.timeStamp * 1000).toLocaleString()}</td>
+                  <td>{transactionType}</td>
+                  <td title={fromAddress}>
+                    {fromLabel === "Я"
+                      ? `Этот счет (${shortenAddress(userAddress)})`
+                      : shortenAddress(fromLabel)}
+                  </td>
+                  <td title={toAddress}>
+                    {toLabel === "Я"
+                      ? `Этот счет (${shortenAddress(userAddress)})`
+                      : shortenAddress(toLabel)}
+                  </td>
+                  <td className={amountClass}>
+                    {sign}
+                    {parseFloat(tx.value).toFixed(2)} {tx.tokenSymbol}
+                  </td>
+                  <td>{status}</td>
+                  <td>
+                    <button
+                      className="download-button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.open(paymentOrderUrl, "_blank");
+                      }}
+                    >
+                      Скачать платежное поручение
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   );
-}
+};
+
+export default TokensTxBlock;

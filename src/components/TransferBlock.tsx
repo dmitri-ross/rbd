@@ -1,6 +1,13 @@
+// components/TransferBlock.js
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import { Web3Button, useAddress, useBalance, useSDK } from "@thirdweb-dev/react";
+import { BigNumber, ethers } from "ethers";
+import { contractAddresses, erc20ABI } from "../../const/contracts";
+import styles from "@/styles/Transfer.module.css";
 import {
   Button,
-  Input,
   Modal,
   ModalBody,
   ModalContent,
@@ -8,11 +15,6 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@nextui-org/react";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
-import { Web3Button, useAddress, useBalance, useSDK } from "@thirdweb-dev/react";
-import { BigNumber, ethers } from "ethers";
-import { contractAddresses, erc20ABI } from "../../const/contracts"; // Импортируем кастомный ABI
 
 export const TransferBlock = ({ symbol = "RUB" }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -31,10 +33,9 @@ export const TransferBlock = ({ symbol = "RUB" }) => {
   useEffect(() => {
     const initContract = async () => {
       if (sdk) {
-        // Используем кастомный ABI для инициализации контракта
+        // Initialize the token contract using the custom ABI
         const tokenContract = await sdk.getContractFromAbi(tokenAddress, erc20ABI);
         const tokenDecimals = await tokenContract.call("decimals");
-        console.log(tokenDecimals);
         setDecimals(tokenDecimals);
       }
     };
@@ -57,7 +58,7 @@ export const TransferBlock = ({ symbol = "RUB" }) => {
   }, [inputAmount, decimals]);
 
   const handleTransfer = async () => {
-    if (BigNumber.from(amountInWei).gte(balance.value)) {
+    if (BigNumber.from(amountInWei).gt(balance.value)) {
       alert("Указанная сумма больше доступного баланса!");
       return;
     }
@@ -69,7 +70,7 @@ export const TransferBlock = ({ symbol = "RUB" }) => {
 
     try {
       setIsTransferring(true);
-      const tokenContract = await sdk.getContractFromAbi(tokenAddress, erc20ABI); // Используем кастомный ABI
+      const tokenContract = await sdk.getContractFromAbi(tokenAddress, erc20ABI);
       await tokenContract.call("transfer", [to, amountInWei]);
       onOpen();
     } catch (error) {
@@ -86,21 +87,21 @@ export const TransferBlock = ({ symbol = "RUB" }) => {
 
   return (
     <>
-      <div className="w-full flex flex-col gap-4">
-        <div className="dark flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-          <Input
-            className="mg-top-20"
-            type="to"
-            label="Адрес получателя:"
+      <div className={styles.form}>
+        <div className={styles.inputField}>
+          <label>Адрес получателя:</label>
+          <input
+            type="text"
             placeholder="0x123..1234"
             onChange={(e) => setToAddress(e.target.value)}
             required
           />
-          <Input
-            className="mg-20"
+        </div>
+        <div className={styles.inputField}>
+          <label>Сумма перевода:</label>
+          <input
             type="number"
             step="0.01"
-            label="Сумма перевода:"
             min="0.01"
             value={inputAmount}
             required
@@ -111,21 +112,20 @@ export const TransferBlock = ({ symbol = "RUB" }) => {
           />
         </div>
       </div>
-      <Web3Button
-        className="checkDis"
-        contractAddress={tokenAddress}
-        action={handleTransfer}
-        isDisabled={isTransferring}
+
+      <button
+        className={styles.transferButton}
+        onClick={handleTransfer}
+        disabled={isTransferring}
       >
         {isTransferring
           ? "Перевод..."
           : BigNumber.from(amountInWei).gt(0)
           ? "Перевести"
           : "Введите сумму"}
-      </Web3Button>
+      </button>
 
       <Modal
-        className="dark"
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         onClose={handleCloseModal}
@@ -133,18 +133,14 @@ export const TransferBlock = ({ symbol = "RUB" }) => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">
+              <ModalHeader  className={styles.modalHeader}>
                 Транзакция подтверждена
               </ModalHeader>
-              <ModalBody>
+              <ModalBody className={styles.modalBody}>
                 <p>Транзакция успешно отправлена!</p>
               </ModalBody>
-              <ModalFooter>
-                <Button
-                  color="danger"
-                  variant="light"
-                  onPress={handleCloseModal}
-                >
+              <ModalFooter className={styles.modalFooter}>
+                <Button color="primary" onPress={handleCloseModal}>
                   Закрыть
                 </Button>
               </ModalFooter>

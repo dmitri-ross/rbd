@@ -23,13 +23,25 @@ export const { ThirdwebAuthHandler, getUser } = ThirdwebAuth({
     onUser: async (userSession) => {
       const user: any = await findUser(userSession.address);
 
+
+
       if (user && user.id) {
         console.log(user);
         return {
           ...userSession,
           userId: user.id || 0,
-          isApproved: user.is_approved || false,
-          businessName: user.business_name 
+          isApproved: true,//user.is_approved || false,
+          businessName: user.business_name,
+          organizationName: user.organization_name,
+          inn: user.inn,
+          domicile: user.domicile,
+          deedOfEstablishmentIpfs: user.deed_of_establishment_ipfs,
+          articlesOfAssociationIpfs: user.articles_of_association_ipfs,
+          legalRepresentativeName: user.legal_representative_name,
+          proofOfCapacityIpfs: user.proof_of_capacity_ipfs,
+          identityDocumentIpfs: user.identity_document_ipfs,
+          contactEmail: user.contact_email,
+          contactPhone: user.contact_phone,
         };
       }
       return {

@@ -24,7 +24,7 @@ import Image from "next/image";
 const Home = observer(() => {
   const { user, isLoggedIn, isLoading } = useUser();
   const router = useRouter();
-  const [businessName, setBusinessName] = useState("");
+  const [organizationName, setorganizationName] = useState("");
   useEffect(() => {
     // Redirect logic
     if (!isLoading && !isLoggedIn) {
@@ -35,7 +35,7 @@ const Home = observer(() => {
   useEffect(() => {
     const UserData: any = user;
     if (UserData?.data) {
-      setBusinessName(UserData.data?.businessName);
+      setorganizationName(UserData.data?.organizationName);
     }
   }, [user]);
 
@@ -122,7 +122,7 @@ const Home = observer(() => {
       <div className="wallet-card">
         <div className="wallet-info">
           <div className="wallet-details">
-            <span className="company-name">{businessName}</span>
+            <span className="company-name">{organizationName}</span>
             <span className="balance">{totalRUBiBalance} RUBi</span>
           </div>
           <div className="wallet-actions">

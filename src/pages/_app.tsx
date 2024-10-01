@@ -1,4 +1,4 @@
-// pages/_app.tsx or similar
+// pages/_app.tsx
 
 import {
   ThirdwebProvider,
@@ -6,6 +6,7 @@ import {
   walletConnect,
   embeddedWallet,
   smartWallet,
+  useDisconnect,
 } from "@thirdweb-dev/react";
 import { contractAddresses } from "../../const/contracts";
 import Head from "next/head";
@@ -54,10 +55,22 @@ function MyApp({ Component, pageProps }) {
       icon: "fas fa-hand-holding-usd",
       label: "Вывести Средства",
     },
+    // New Menu Items
+    {
+      href: "/profile",
+      icon: "fas fa-user",
+      label: "Профиль организации",
+    },
+    {
+      href: "/logout",
+      icon: "fas fa-sign-out-alt",
+      label: "Выйти",
+    },
   ];
 
   // Function to check if menu item is active
   const isActive = (item) => {
+    // For exact match
     return router.asPath === item.href;
   };
 
@@ -110,6 +123,14 @@ function MyApp({ Component, pageProps }) {
             href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
             rel="stylesheet"
           />
+          {/* Font Awesome CDN */}
+          {/* <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+            integrity="sha512-dNm+0cPGaA1YlE3PFgFZW0O1qRWWd5g+B2PcqB2xjbnI/9TpNdSmMKg8DH6sxJhnh1MxaKj2l95nR1uCHo8YQg=="
+            crossOrigin="anonymous"
+            referrerPolicy="no-referrer"
+          /> */}
         </Head>
 
         {router.pathname !== "/login" ? (
@@ -120,7 +141,7 @@ function MyApp({ Component, pageProps }) {
               <button className="menu-toggle" onClick={toggleSidebar}>
                 <svg
                   className="menu-icon"
-                  enable-background="new 0 0 464.205 464.205"
+                  enableBackground="new 0 0 464.205 464.205"
                   viewBox="0 0 464.205 464.205"
                   xmlns="http://www.w3.org/2000/svg"
                 >
@@ -141,26 +162,35 @@ function MyApp({ Component, pageProps }) {
 
             {/* Sidebar */}
             <div className={`sidebar ${isSidebarOpen ? "open" : ""}`}>
-              <ul className="menu-toggle">
-                <li>
-                  <button className="menu-toggle" onClick={toggleSidebar}>
-                    <svg
-                      className="menu-icon"
-                      enable-background="new 0 0 464.205 464.205"
-                      viewBox="0 0 464.205 464.205"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <g>
-                        <g id="grip-solid-horizontal_1_">
-                          <path d="m435.192 406.18h-406.179c-16.024 0-29.013-12.99-29.013-29.013s12.989-29.013 29.013-29.013h406.18c16.023 0 29.013 12.99 29.013 29.013-.001 16.023-12.99 29.013-29.014 29.013z" />
-                          <path d="m435.192 261.115h-406.179c-16.024 0-29.013-12.989-29.013-29.012s12.989-29.013 29.013-29.013h406.18c16.023 0 29.013 12.989 29.013 29.013s-12.99 29.012-29.014 29.012z" />
-                          <path d="m435.192 116.051h-406.179c-16.024 0-29.013-12.989-29.013-29.013s12.989-29.013 29.013-29.013h406.18c16.023 0 29.013 12.989 29.013 29.013s-12.99 29.013-29.014 29.013z" />
-                        </g>
-                      </g>
-                    </svg>
-                  </button>
-                </li>
-              </ul>
+              {/* Close button inside sidebar for mobile */}
+              <button
+                className="menu-toggle close-button"
+                onClick={toggleSidebar}
+              >
+                <svg
+                  className="close-icon"
+                  enableBackground="new 0 0 24 24"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <line
+                    x1="4"
+                    y1="4"
+                    x2="20"
+                    y2="20"
+                    stroke="#fff"
+                    strokeWidth="2"
+                  />
+                  <line
+                    x1="20"
+                    y1="4"
+                    x2="4"
+                    y2="20"
+                    stroke="#fff"
+                    strokeWidth="2"
+                  />
+                </svg>
+              </button>
               <div className="logo">
                 <Link href="/" legacyBehavior>
                   <a>
@@ -177,7 +207,11 @@ function MyApp({ Component, pageProps }) {
                 {menuItems.map((item) => (
                   <li key={item.href}>
                     <Link href={item.href} legacyBehavior>
-                      <a className={isActive(item) ? "active" : ""}>
+                      <a
+                        className={`menu-item ${
+                          isActive(item) ? "active" : ""
+                        }`}
+                      >
                         <i className={item.icon}></i> <span>{item.label}</span>
                       </a>
                     </Link>
@@ -210,21 +244,7 @@ function MyApp({ Component, pageProps }) {
           </>
         ) : (
           <>
-            <div className="login">
-              <main className="main-content">
-                <Component {...pageProps} />
-              </main>
-              <footer className="login footer">
-                <p>
-                  Служба поддержки:{" "}
-                  <a href="mailto:support@rosdao.ru">support@rosdao.ru</a> |
-                  Телефон: +7 (495) 123-45-67
-                </p>
-                <div className="footer-links">
-                  <a href="https://docs.stableunion.org/">Документация</a>
-                </div>
-              </footer>
-            </div>
+            <Component {...pageProps} />
           </>
         )}
       </ThirdwebProvider>

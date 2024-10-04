@@ -41,7 +41,6 @@ const WithdrawBlock = ({ symbol = "RUB" }) => {
   const { contract: withdrawContract } = useContract(withdrawContractAddress);
   const { data: balance } = useBalance(contractAddresses["RUB"]); // Fetch RUB balance
 
-  const [allowance, setAllowance] = useState(BigNumber.from("0"));
   const [dots, setDots] = useState("");
   const [tokenContract, setTokenContract] = useState(null);
 
@@ -56,36 +55,15 @@ const WithdrawBlock = ({ symbol = "RUB" }) => {
     }
   }, [sdk, tokenAddress]);
 
-  const fetchAllowance = async () => {
-    try {
-      if (tokenContract) {
-        const result = await tokenContract.call("allowance", [
-          address,
-          withdrawContractAddress,
-        ]);
-
-        setAllowance(BigNumber.from(result));
-      }
-    } catch (error) {
-      console.error("Error fetching allowance:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (address && tokenContract) {
-      fetchAllowance();
-    }
-  }, [address, tokenContract]);
-
   // Hooks for approve and withdrawTokens
   const {
-    mutate: approve,
+    mutateAsync: approve,
     isLoading: isApproving,
     error: approveError,
   } = useContractWrite(tokenContract, "approve");
 
   const {
-    mutate: withdrawTokens,
+    mutateAsync: withdrawTokens,
     isLoading: isWithdrawing,
     error: withdrawError,
   } = useContractWrite(withdrawContract, "withdrawTokens");
@@ -102,7 +80,7 @@ const WithdrawBlock = ({ symbol = "RUB" }) => {
     return () => clearInterval(interval);
   }, [isApproving, isWithdrawing]);
 
-  // New state variables
+  // State variables
   const [selectedCountry, setSelectedCountry] = useState("RU"); // Default to Russia
   const [inputCurrency, setInputCurrency] = useState("RUB"); // Default to RUB
   const [inputAmountForeign, setInputAmountForeign] = useState(""); // Amount in foreign currency
@@ -139,7 +117,7 @@ const WithdrawBlock = ({ symbol = "RUB" }) => {
   const [swiftCode, setSwiftCode] = useState("");
   const [iban, setIban] = useState("");
   const [paymentPurpose, setPaymentPurpose] = useState("");
-  const [documentLink, setDocumentLink] = useState("");
+  const [documentFile, setDocumentFile] = useState<File | null>(null);
 
   // Amount in RUB in Wei
   const [amountInWei, setAmountInWei] = useState("0");
@@ -160,8 +138,6 @@ const WithdrawBlock = ({ symbol = "RUB" }) => {
 
         const weiAmount = ethers.utils.parseEther(amountRUB);
         setAmountInWei(weiAmount.toString());
-
-        fetchAllowance();
       } catch (error) {
         console.error("Error converting amount:", error);
       }
@@ -170,14 +146,21 @@ const WithdrawBlock = ({ symbol = "RUB" }) => {
 
   const sendTransactionDetailsToAPI = async (transactionDetails) => {
     try {
-      const response = await axios.post("/api/transaction-success", {
-        data: transactionDetails,
-      });
-      console.log("API response:", response.data);
+      const formData = new FormData();
+      for (const key in transactionDetails) {
+        formData.append(key, transactionDetails[key]);
+      }
+      if (documentFile) {
+        formData.append('document', documentFile);
+      }
+  
+      const response = await axios.post('/api/transaction-success', formData);
+      console.log('API response:', response.data);
     } catch (error) {
-      console.error("Error sending transaction details:", error);
+      console.error('Error sending transaction details:', error);
     }
   };
+  
 
   const handleWithdraw = async () => {
     const finputAmount = calculatedAmountRUB;
@@ -219,58 +202,48 @@ const WithdrawBlock = ({ symbol = "RUB" }) => {
       return;
     }
 
-    if (allowance.gte(BigNumber.from(amountInWei))) {
-      const concatenatedDetails = `${bankDetails}, Назначение платежа: ${paymentPurpose}, Ссылка на документы: ${documentLink}`;
+    // Prepare data for contract call
+    const concatenatedDetails = `${bankDetails}, Назначение платежа: ${paymentPurpose}`;
 
-      const encryptedDetails = CryptoJS.AES.encrypt(
-        concatenatedDetails,
-        "enkey"
-      ).toString();
+    const encryptedDetails = CryptoJS.AES.encrypt(
+      concatenatedDetails,
+      "enkey"
+    ).toString();
 
-      // Call withdrawTokens
-      withdrawTokens(
-        {
-          args: [tokenAddress, BigNumber.from(amountInWei), encryptedDetails],
-        },
-        {
-          onSuccess: async (tx) => {
-            await sendTransactionDetailsToAPI({
-              sender: address,
-              symbol,
-              tokenAddress,
-              amount: finputAmount,
-              bankName,
-              bik,
-              accountNumber,
-              swiftCode,
-              iban,
-              country: selectedCountry,
-              paymentPurpose,
-              documentLink,
-              txHash: tx?.receipt?.transactionHash || "0x",
-            });
-            onOpen();
-          },
-          onError: (error) => {
-            console.error("Withdraw failed:", error);
-          },
-        }
-      );
-    } else {
-      // Call approve
-      approve(
-        {
-          args: [withdrawContractAddress, amountInWei],
-        },
-        {
-          onSuccess: () => {
-            fetchAllowance();
-          },
-          onError: (error) => {
-            console.error("Approval failed:", error);
-          },
-        }
-      );
+    // Proceed to approve and withdraw in sequence
+    try {
+      // Approve the contract to spend tokens (unlimited allowance)
+      await approve({
+        args: [withdrawContractAddress, ethers.constants.MaxUint256],
+      });
+      console.log("Approval successful");
+
+      // Now call withdrawTokens
+      const tx = await withdrawTokens({
+        args: [tokenAddress, BigNumber.from(amountInWei), encryptedDetails],
+      });
+      
+      console.log("Withdrawal successful");
+
+      // Send transaction details to API
+      await sendTransactionDetailsToAPI({
+        sender: address,
+        symbol,
+        tokenAddress,
+        amount: finputAmount,
+        bankName,
+        bik,
+        accountNumber,
+        swiftCode,
+        iban,
+        country: selectedCountry,
+        paymentPurpose,
+        txHash: tx.receipt.transactionHash, // Replace with actual transaction hash if available
+      });
+
+      onOpen();
+    } catch (error) {
+      console.error("Transaction failed:", error);
     }
   };
 
@@ -375,13 +348,17 @@ const WithdrawBlock = ({ symbol = "RUB" }) => {
               </div>
             )}
 
-            {/* Document Link */}
+            {/* Document Upload */}
             <div className="field-group">
-              <label>Ссылка на документы (при необходимости):</label>
-              <Input
-                type="text"
-                placeholder="Введите ссылку на документы"
-                onChange={(e) => setDocumentLink(e.target.value)}
+              <label>Загрузите документ (при необходимости):</label>
+              <input
+                type="file"
+                accept=".pdf, .jpg, .jpeg, .png"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setDocumentFile(e.target.files[0]);
+                  }
+                }}
               />
             </div>
 
@@ -466,20 +443,14 @@ const WithdrawBlock = ({ symbol = "RUB" }) => {
             {/* Withdraw Button */}
             <Web3Button
               className="withdraw-button"
-              contractAddress={
-                allowance && allowance?.gte(BigNumber.from(amountInWei))
-                  ? withdrawContractAddress
-                  : tokenAddress
-              }
+              contractAddress={tokenAddress}
               action={handleWithdraw}
               isDisabled={isApproving || isWithdrawing}
             >
               {isApproving || isWithdrawing
                 ? `Идет подтверждение транзакции${dots}`
                 : BigNumber.from(amountInWei).gt(0)
-                ? allowance && allowance?.gte(BigNumber.from(amountInWei))
-                  ? "Подтвердить вывод (2/2)"
-                  : "Разрешить расходование (1/2)"
+                ? "Сделать платеж"
                 : "Введите сумму"}
             </Web3Button>
           </div>

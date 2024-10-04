@@ -173,7 +173,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         <div class="container">
             <div class="header">
                 <img src="/logo.png" alt="Логотип РосДАО">
-                <h1>Платежное поручение</h1>
+                <h1>Детали транзакции</h1>
             </div>
 
             <table>

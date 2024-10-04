@@ -758,7 +758,9 @@ footer a {
   color: red;
   font-weight: bold;
 }
-
+.tx-button{
+  text-decoration: underline;
+}
 .download-button {
   background-color: #003366;
   border: none;

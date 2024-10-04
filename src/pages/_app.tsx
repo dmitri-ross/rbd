@@ -7,6 +7,7 @@ import {
   embeddedWallet,
   smartWallet,
   useDisconnect,
+  magicLink,
 } from "@thirdweb-dev/react";
 import { contractAddresses } from "../../const/contracts";
 import Head from "next/head";
@@ -86,18 +87,19 @@ function MyApp({ Component, pageProps }) {
           authUrl: "/api/auth",
         }}
         supportedWallets={[
-          smartWallet(metamaskWallet(), {
-            factoryAddress: "0xc31aeCC486a5EE5019cD9834191A42e6238733ff",
-            gasless: true,
-          }),
-          smartWallet(walletConnect(), {
-            factoryAddress: "0xc31aeCC486a5EE5019cD9834191A42e6238733ff",
-            gasless: true,
-          }),
+          // smartWallet(metamaskWallet(), {
+          //   factoryAddress: "0xc31aeCC486a5EE5019cD9834191A42e6238733ff",
+          //   gasless: true,
+          // }),
+          // smartWallet(walletConnect(), {
+          //   factoryAddress: "0xc31aeCC486a5EE5019cD9834191A42e6238733ff",
+          //   gasless: true,
+          // }),
+        
           smartWallet(
             embeddedWallet({
               auth: {
-                options: ["email", "google", "facebook"],
+                options: ["email"],
               },
               recommended: true,
             }),

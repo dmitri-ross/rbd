@@ -89,11 +89,11 @@ const TokensTxBlock = ({ symbol }: { symbol: string }) => {
               }
 
               // Transaction status (assuming all transactions are completed)
-              const status = "Завершено";
+              const status = "Исполнено";
 
               // URL for downloading the payment order
               const paymentOrderUrl = `/api/transaction/${tx.hash}`;
-
+              const txOrderUrl = `/api/withdrawals/${tx.hash}`;
               // Shorten addresses for display
               const shortenAddress = (address: string) =>
                 address.slice(0, 6) + "..." + address.slice(-4);
@@ -118,14 +118,23 @@ const TokensTxBlock = ({ symbol }: { symbol: string }) => {
                   </td>
                   <td>{status}</td>
                   <td>
-                    <button
+                  <button
                       className="download-button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.open(txOrderUrl, "_blank");
+                      }}
+                    >
+                      Скачать платежное поручение
+                    </button><br/>
+                    <button
+                      className="tx-button"
                       onClick={(e) => {
                         e.preventDefault();
                         window.open(paymentOrderUrl, "_blank");
                       }}
                     >
-                      Скачать платежное поручение
+                      Детали транзакции
                     </button>
                   </td>
                 </tr>

@@ -36,7 +36,7 @@ const SwapBlock = () => {
 
   const tokenOptions = ["RUR", "USDC", "RUBi", "USDT"];
   const tokenSymbols: { [key: string]: string } = {
-    RUR: "RURi",
+    RUR: "RUR",
     USDC: "USDC",
     RUBi: "RUBi",
     USDT: "USDT",

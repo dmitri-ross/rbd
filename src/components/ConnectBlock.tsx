@@ -48,7 +48,7 @@ export const ConnectBlock = ({ symbol = "RUR", onlyBalance = false }) => {
             {
               address: contractAddresses["RUR"],
               name: "Ruble",
-              symbol: "RURi",
+              symbol: "RUR",
               icon: `/RUR.png`,
             },
             {

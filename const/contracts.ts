@@ -1,5 +1,5 @@
 // Replace this with your contract address
-export const contractAddresses = { "RUR": "0x18c8bA059F2a94Af29D0ef368D8B1565015a53fb", "USD": "0x4530978Afd7B2301C0E4d444359044fb55c87c1c", "CNY": "0x8B9a37aB6EDccb579b68666268050Eec14B6166A", "USDT": "0xc2132d05d31c914a87c6611c10748aeb04b58e8f", "RUBi": "0x470faE9851ec77E9FbF9038B78175776BF21E579" }
+export const contractAddresses = { "RUR": "0x18c8bA059F2a94Af29D0ef368D8B1565015a53fb", "USD": "0x4530978Afd7B2301C0E4d444359044fb55c87c1c", "CNY": "0x8B9a37aB6EDccb579b68666268050Eec14B6166A", "USDT": "0xc2132d05d31c914a87c6611c10748aeb04b58e8f","USDC": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174", "RUBi": "0x470faE9851ec77E9FbF9038B78175776BF21E579" }
 export const configMetadataUSDT = { data: { image: "/usdt.png", symbol: "USDT", description: "USD Tether-Polygon", name: "USD Tether-Polygon" }, decimals: "6" }
 
 

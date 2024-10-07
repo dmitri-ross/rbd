@@ -46,9 +46,9 @@ const Home = observer(() => {
     if (
       currency &&
       typeof currency === "string" &&
-      validCurrencies.includes(currency.toUpperCase())
+      validCurrencies.includes(currency)
     ) {
-      setSelectedAccount(currency.toUpperCase());
+      setSelectedAccount(currency);
     } else {
       setSelectedAccount("RUR"); // Валюта по умолчанию
     }
@@ -122,6 +122,7 @@ const Home = observer(() => {
 
   const handleAccountClick = (currency: string) => {
     setSelectedAccount(currency);
+    console.log(currency);
     router.push(`/?currency=${currency}`, undefined, { shallow: true });
   };
 

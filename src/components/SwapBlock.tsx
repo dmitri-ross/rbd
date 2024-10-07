@@ -32,6 +32,8 @@ const SwapBlock = () => {
   const address = useAddress();
   const sdk = useSDK();
 
+  const { inCurrency, outCurrency } = router.query;
+
   const tokenOptions = ["RUB", "USDC", "DAI", "USDT"];
   const tokenSymbols: { [key: string]: string } = {
     RUB: "RUBi",
@@ -39,6 +41,7 @@ const SwapBlock = () => {
     DAI: "DAI",
     USDT: "USDT",
   };
+
   const [fromToken, setFromToken] = useState<string>("USDT");
   const [toToken, setToToken] = useState<string>("RUB");
   const [inputAmount, setInputAmount] = useState<string>("");
@@ -55,6 +58,36 @@ const SwapBlock = () => {
   );
   const [toReserves, setToReserves] = useState<BigNumber>(BigNumber.from("0"));
   const [dots, setDots] = useState("");
+
+  useEffect(() => {
+    console.log( inCurrency, outCurrency );
+    // Допустимые валюты
+    const validTokens = ["RUB", "USDC", "DAI", "USDT"];
+
+    // Проверяем и устанавливаем fromToken
+    if (
+      inCurrency &&
+      typeof inCurrency === "string" &&
+      validTokens.includes(inCurrency.toUpperCase())
+    ) {
+      setFromToken(inCurrency.toUpperCase());
+    } else {
+      setFromToken("USDT"); // Значение по умолчанию
+    }
+
+    // Проверяем и устанавливаем toToken
+    if (
+      outCurrency &&
+      typeof outCurrency === "string" &&
+      validTokens.includes(outCurrency.toUpperCase())
+    ) {
+      setToToken(outCurrency.toUpperCase());
+    } else {
+      setToToken("RUB"); // Значение по умолчанию
+    }
+    
+    console.log(fromToken, toToken);
+  }, [inCurrency, outCurrency]);
 
   useEffect(() => {
     if (!address) return;
@@ -234,8 +267,9 @@ const SwapBlock = () => {
       alert("Невозможно обменять на ту же валюту.");
       return;
     }
+    const temp = fromToken;
     setFromToken(toToken);
-    setToToken(fromToken);
+    setToToken(temp);
   };
 
   const handleFromTokenChange = (key: string) => {
@@ -277,10 +311,12 @@ const SwapBlock = () => {
 
           <Dropdown>
             <DropdownTrigger>
-              <Button className="swap-currency" variant="bordered">{tokenSymbols[fromToken]}</Button>
+              <Button className="swap-currency" variant="bordered">
+                {tokenSymbols[fromToken]}
+              </Button>
             </DropdownTrigger>
             <DropdownMenu
-              aria-label="Select From Token"
+              aria-label="Выберите валюту продажи"
               onAction={(key) => handleFromTokenChange(key as string)}
             >
               {tokenOptions.map((token) => (
@@ -304,7 +340,7 @@ const SwapBlock = () => {
               value={
                 rate && inputAmount
                   ? (Number(inputAmount) * Number(rate)).toFixed(6)
-                  : "Загрузка..."
+                  : ""
               }
               placeholder={`0.00`}
               disabled
@@ -313,10 +349,12 @@ const SwapBlock = () => {
 
           <Dropdown>
             <DropdownTrigger>
-              <Button className="swap-currency" variant="bordered">{tokenSymbols[toToken]}</Button>
+              <Button className="swap-currency" variant="bordered">
+                {tokenSymbols[toToken]}
+              </Button>
             </DropdownTrigger>
             <DropdownMenu
-              aria-label="Select To Token"
+              aria-label="Выберите валюту покупки"
               onAction={(key) => handleToTokenChange(key as string)}
             >
               {tokenOptions.map((token) => (
@@ -362,7 +400,9 @@ const SwapBlock = () => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="fixed-modeal-header">Обмен успешно завершен</ModalHeader>
+              <ModalHeader className="fixed-modeal-header">
+                Обмен успешно завершен
+              </ModalHeader>
               <ModalBody>
                 <p>Ваш обмен был успешно завершен!</p>
               </ModalBody>

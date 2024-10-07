@@ -1541,3 +1541,113 @@ header .user-info a:hover {
   font-size: 18px;
   font-weight: 500;
 }
+/* Adjust other existing styles as needed */
+.account {
+  cursor: pointer;
+  padding: 15px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  transition: background-color 0.3s;
+}
+
+.account:hover {
+  background-color: #f9f9f9;
+}
+
+.account-selected {
+  background-color: #e0f7fa;
+  border-color: #0097a7;
+}
+
+.transactions-section {
+  margin-top: 20px;
+}
+
+.download-button,
+.tx-button {
+  margin-bottom: 5px;
+  padding: 5px 10px;
+  font-size: 14px;
+}
+
+.amount-in {
+  color: green;
+}
+
+.amount-out {
+  color: red;
+}
+.current-balance-section {
+  margin-top: 40px;
+}
+
+.wallet-details {
+  margin-bottom: 10px;
+}
+
+.wallet-actions button {
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+
+
+.account-selected {
+  background-color: #e0f7fa;
+  border-color: #0097a7;
+}
+.wallet-actions button {
+  margin-right: 10px;
+  margin-bottom: 10px;
+  padding: 10px 15px;
+  font-size: 14px;
+  cursor: pointer;
+}
+/* styles.css или ваш CSS-файл */
+
+.deposit-container {
+  margin-top: 20px;
+}
+
+.deposit-details {
+  background-color: #f9f9f9;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+}
+
+.deposit-details p {
+  margin: 5px 0;
+}
+
+.qr-code {
+ 
+  margin-bottom: 20px;
+}
+
+.alert-message {
+  background-color: #ffe5e5;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.alert-message .danger {
+  color: #d8000c;
+}
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* другие стили */
+}
+
+.header-organization {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.header-organization span {
+  font-size: 16px;
+  font-weight: bold;
+  color:#fff
+}

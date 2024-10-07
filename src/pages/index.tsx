@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
-  MediaRenderer,
   useBalance,
   useContract,
   useContractMetadata,
@@ -17,14 +16,16 @@ import {
   configMetadataUSDC,
   configMetadataDAI,
 } from "../../const/contracts";
+import TokensTxBlock from "../components/TokensTxBlock";
 import styles from "../styles/Home.module.css";
-import Link from "next/link";
-import Image from "next/image";
 
 const Home = observer(() => {
   const { user, isLoggedIn, isLoading } = useUser();
   const router = useRouter();
+  const { currency } = router.query; // Получаем параметр currency из URL
   const [organizationName, setorganizationName] = useState("");
+  const [selectedAccount, setSelectedAccount] = useState<string>("RUB");
+
   useEffect(() => {
     // Redirect logic
     if (!isLoading && !isLoggedIn) {
@@ -39,6 +40,20 @@ const Home = observer(() => {
     }
   }, [user]);
 
+  // Обрабатываем параметр currency из URL
+  useEffect(() => {
+    const validCurrencies = ["RUB", "USDT", "USDC", "DAI"];
+    if (
+      currency &&
+      typeof currency === "string" &&
+      validCurrencies.includes(currency.toUpperCase())
+    ) {
+      setSelectedAccount(currency.toUpperCase());
+    } else {
+      setSelectedAccount("RUB"); // Валюта по умолчанию
+    }
+  }, [currency]);
+
   // Define balances
   const { data: balanceRUB } = useBalance(contractAddresses["RUB"]);
   const { data: balanceUSDT } = useBalance(contractAddresses["USDT"]);
@@ -50,13 +65,13 @@ const Home = observer(() => {
   const { data: metadataRUB } = useContractMetadata(contractRUB.contract);
 
   const contractUSDT = useContract(contractAddresses["USDT"]);
-  const { data: metadataUSDT }  = configMetadataUSDT;
+  const { data: metadataUSDT } = configMetadataUSDT;
 
   const contractUSDC = useContract(contractAddresses["USDC"]);
   const { data: metadataUSDC } = configMetadataUSDC;
 
   const contractDAI = useContract(contractAddresses["DAI"]);
-  const { data: metadataDAI }  = configMetadataDAI;
+  const { data: metadataDAI } = configMetadataDAI;
 
   const [fetchedContracts, setFetchedContracts] = useState<any[]>([]);
   const [balance, setBalance] = useState<any>({
@@ -99,135 +114,137 @@ const Home = observer(() => {
       { currency: "DAI", contract: contractDAI, metadata: metadataDAI },
     ];
     contractStore.setContracts(contracts);
-    
+
     setFetchedContracts(contracts);
     console.log(contracts);
     console.log(user);
   }, [metadataRUB]);
 
+  const handleAccountClick = (currency: string) => {
+    setSelectedAccount(currency);
+    router.push(`/?currency=${currency}`, undefined, { shallow: true });
+  };
+
   const handleNavigation = (url: string) => {
     router.push(url);
   };
 
-  // Calculate total RUBi balance
-  const totalRUBiBalance = balance["RUB"];
-
   return (
     <>
-      {/* Main Content */}
+      {/* Заголовок */}
       <div className="dashboard-header">
-        <h1>Главная</h1>
+        <h1>{organizationName}</h1>
       </div>
 
-      <div className="wallet-card">
-        <div className="wallet-info">
-          <div className="wallet-details">
-            <span className="company-name">{organizationName}</span>
-            <span className="balance">{totalRUBiBalance} RUBi</span>
-          </div>
-          <div className="wallet-actions">
-            <button onClick={() => handleNavigation("/withdraw/RUB")}>
-              Новый Платеж
-            </button>
-            <button onClick={() => handleNavigation("/swap")}>
-              Обмен ИЦП
-            </button>
-            <button onClick={() => handleNavigation("/deposit/RUB")}>
-              Пополнить Счет
-            </button>
-            <button onClick={() => handleNavigation("/withdraw/RUB?self=true")}>
-              Вывести Средства
-            </button>
-          </div>
-        </div>
-      </div>
-
+      {/* Список счетов */}
       <div className="accounts">
-        
-        <h2>Счета Компании:</h2>
+        <h2>Выбор счета:</h2>
         <div className="account-list">
-          {/* RUB Account */}
-          {fetchedContracts
-            .filter(({ currency }) => currency === "RUB")
-            .map(({ currency, metadata }, index) => (
-              <div
-                onClick={() => handleNavigation(`/transactions/${currency}`)}
-                key={index}
-                className="account"
-              >
-                <i className="fas fa-ruble-sign account-icon"></i>
-                <span>
-                  {metadata?.name} ({metadata?.symbol})
-                </span>
-                <span className="amount">
-                  {balance[currency]} {metadata?.symbol}
-                </span>
-              </div>
-            ))}
+          {fetchedContracts.map(({ currency, metadata }, index) => (
+            <div
+              onClick={() => handleAccountClick(currency)}
+              key={index}
+              className={`account ${
+                selectedAccount === currency ? "account-selected" : ""
+              }`}
+            >
+              <i className="fas fa-wallet account-icon"></i>
+              <span>
+                {metadata?.name} ({metadata?.symbol})
+              </span>
+              <span className="amount">
+                {balance[currency]} {metadata?.symbol}
+              </span>
             </div>
-            
-          <h2 className="mb-50">ИЦП Компании:</h2>
-          <div className="account-list">
-          {/* USDT Account */}
-          {fetchedContracts
-            .filter(({ currency }) => currency === "USDT")
-            .map(({ currency, metadata }, index) => (
-              <div
-                onClick={() => handleNavigation(`/transactions/${currency}`)}
-                key={index}
-                className="account"
-              >
-                <i className="fas fa-dollar-sign account-icon"></i>
-                <span>
-                  {metadata?.name} ({metadata?.symbol})
-                </span>
-                <span className="amount">
-                  {balance[currency]} {metadata?.symbol}
-                </span>
-              </div>
-            ))}
-
-          {/* USDC Account */}
-          {fetchedContracts
-            .filter(({ currency }) => currency === "USDC")
-            .map(({ currency, metadata }, index) => (
-              <div
-                onClick={() => handleNavigation(`/transactions/${currency}`)}
-                key={index}
-                className="account"
-              >
-                <i className="fas fa-dollar-sign account-icon"></i>
-                <span>
-                  {metadata?.name} ({metadata?.symbol})
-                </span>
-                <span className="amount">
-                  {balance[currency]} {metadata?.symbol}
-                </span>
-              </div>
-            ))}
-
-          {/* DAI Account */}
-          {fetchedContracts
-            .filter(({ currency }) => currency === "DAI")
-            .map(({ currency, metadata }, index) => (
-              <div
-                onClick={() => handleNavigation(`/transactions/${currency}`)}
-                key={index}
-                className="account"
-              >
-                <i className="fas fa-dollar-sign account-icon"></i>
-                <span>
-                  {metadata?.name} ({metadata?.symbol})
-                </span>
-                <span className="amount">
-                  {balance[currency]} {metadata?.symbol}
-                </span>
-              </div>
-            ))}
+          ))}
         </div>
       </div>
 
-      {/* You can add deposits and investments sections similarly if needed */}
+      {/* Блок текущего баланса */}
+      <div className="current-balance-section">
+        <h2>Текущий баланс:</h2>
+        <div className="wallet-card">
+          <div className="wallet-info">
+            <div className="wallet-details">
+              <span className="company-name">Баланс</span>
+              <span className="balance">
+                {balance[selectedAccount]} {selectedAccount}
+              </span>
+            </div>
+            <div className="wallet-actions">
+              {selectedAccount === "RUB" ? (
+                <>
+                  <button onClick={() => handleNavigation(`/withdraw/RUB`)}>
+                    Иностранный Платеж
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleNavigation(
+                        `/swap?inCurrency=RUB&outCurrency=USDT`
+                      )
+                    }
+                  >
+                    Купить ИЦП
+                  </button>
+                  <button onClick={() => handleNavigation(`/deposit/RUB`)}>
+                    Пополнить
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleNavigation(`/withdraw/RUB?self=true`)
+                    }
+                  >
+                    Вывести
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() =>
+                      handleNavigation(`/transfer/${selectedAccount}`)
+                    }
+                  >
+                    Отправить
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleNavigation(`/deposit/${selectedAccount}`)
+                    }
+                  >
+                    Принять
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleNavigation(
+                        `/swap?outCurrency=RUB&inCurrency=${selectedAccount}`
+                      )
+                    }
+                  >
+                    Купить
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleNavigation(
+                        `/swap?inCurrency=${selectedAccount}`
+                      )
+                    }
+                  >
+                    Обменять
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Компонент транзакций */}
+      {selectedAccount && (
+        <div className="transactions-section">
+          <h2>Транзакции по счету {selectedAccount}:</h2>
+          <TokensTxBlock symbol={selectedAccount} />
+        </div>
+      )}
     </>
   );
 });

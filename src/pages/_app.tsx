@@ -41,18 +41,18 @@ function MyApp({ Component, pageProps }) {
   const menuItems = [
     { href: "/", icon: "fas fa-wallet", label: "Счета и Балансы" },
     {
-      href: "/withdraw/RUB",
+      href: "/withdraw/RUR",
       icon: "fas fa-file-invoice-dollar",
       label: "Новый платеж",
     },
     { href: "/swap", icon: "fas fa-swap-alt", label: "Обмен ИЦП" },
     {
-      href: "/deposit/RUB",
+      href: "/deposit/RUR",
       icon: "fas fa-credit-card",
       label: "Пополнить Счет",
     },
     {
-      href: "/withdraw/RUB?self=true",
+      href: "/withdraw/RUR?self=true",
       icon: "fas fa-hand-holding-usd",
       label: "Вывести Средства",
     },

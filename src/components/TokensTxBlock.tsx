@@ -118,15 +118,22 @@ const TokensTxBlock = ({ symbol }: { symbol: string }) => {
                   </td>
                   <td>{status}</td>
                   <td>
-                  <button
-                      className="download-button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        window.open(txOrderUrl, "_blank");
-                      }}
-                    >
-                      Скачать платежное поручение
-                    </button><br/>
+                    {transactionType === "Вывод на банковский счет" ? (
+                      <>
+                        <button
+                          className="download-button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            window.open(txOrderUrl, "_blank");
+                          }}
+                        >
+                          Скачать платежное поручение
+                        </button>
+                        <br />{" "}
+                      </>
+                    ) : (
+                      <></>
+                    )}
                     <button
                       className="tx-button"
                       onClick={(e) => {

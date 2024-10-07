@@ -11,7 +11,7 @@ import {
   useUser,
 } from "@thirdweb-dev/react";
 
-export const ConnectBlock = ({ symbol = "RUB", onlyBalance = false }) => {
+export const ConnectBlock = ({ symbol = "RUR", onlyBalance = false }) => {
   // Получаем данные пользователя
   const { user, isLoggedIn, isLoading } = useUser();
   const [organizationName, setOrganizationName] = useState("");
@@ -46,10 +46,10 @@ export const ConnectBlock = ({ symbol = "RUB", onlyBalance = false }) => {
         supportedTokens={{
           [137]: [
             {
-              address: contractAddresses["RUB"],
-              name: "Digital Ruble",
-              symbol: "RUBi",
-              icon: `/rub.png`,
+              address: contractAddresses["RUR"],
+              name: "Ruble",
+              symbol: "RURi",
+              icon: `/RUR.png`,
             },
             {
               address: contractAddresses["USD"],

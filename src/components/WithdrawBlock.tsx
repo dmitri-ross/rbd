@@ -30,7 +30,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import { BigNumber, ethers } from "ethers";
 
-const WithdrawBlock = ({ symbol = "RUB" }) => {
+const WithdrawBlock = ({ symbol = "RUR" }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const router = useRouter();
   const { self } = router.query; // Get 'self' from query parameters
@@ -39,7 +39,7 @@ const WithdrawBlock = ({ symbol = "RUB" }) => {
   const address = useAddress();
   const sdk = useSDK();
   const { contract: withdrawContract } = useContract(withdrawContractAddress);
-  const { data: balance } = useBalance(contractAddresses["RUB"]); // Fetch RUB balance
+  const { data: balance } = useBalance(contractAddresses["RUR"]); // Fetch RUR balance
 
   const [dots, setDots] = useState("");
   const [tokenContract, setTokenContract] = useState(null);
@@ -82,32 +82,32 @@ const WithdrawBlock = ({ symbol = "RUB" }) => {
 
   // State variables
   const [selectedCountry, setSelectedCountry] = useState("RU"); // Default to Russia
-  const [inputCurrency, setInputCurrency] = useState("RUB"); // Default to RUB
+  const [inputCurrency, setInputCurrency] = useState("RUR"); // Default to RUR
   const [inputAmountForeign, setInputAmountForeign] = useState(""); // Amount in foreign currency
-  const [exchangeRate, setExchangeRate] = useState(1); // Exchange rate to RUB
-  const [calculatedAmountRUB, setCalculatedAmountRUB] = useState("0"); // Amount in RUB
+  const [exchangeRate, setExchangeRate] = useState(1); // Exchange rate to RUR
+  const [calculatedAmountRUR, setCalculatedAmountRUR] = useState("0"); // Amount in RUR
 
   // Define countries and currencies
   const countries = [
-    { code: "RU", name: "Россия", currency: "RUB" },
+    { code: "RU", name: "Россия", currency: "RUR" },
     { code: "CN", name: "Китай", currency: "CNY" },
     { code: "AE", name: "ОАЭ", currency: "AED" },
     { code: "TR", name: "Турция", currency: "TRY" },
   ];
 
-  // Exchange rates to RUB
+  // Exchange rates to RUR
   const exchangeRates = {
-    RUB: 1, // 1 RUB = 1 RUB
-    CNY: 14, // 1 CNY = 14 RUB
-    AED: 20, // 1 AED = 20 RUB
-    TRY: 3, // 1 TRY = 3 RUB
+    RUR: 1, // 1 RUR = 1 RUR
+    CNY: 14, // 1 CNY = 14 RUR
+    AED: 20, // 1 AED = 20 RUR
+    TRY: 3, // 1 TRY = 3 RUR
   };
 
   // Update exchange rate based on selected currency
   useEffect(() => {
     const country = countries.find((c) => c.code === selectedCountry);
-    setInputCurrency(country?.currency || "RUB");
-    setExchangeRate(exchangeRates[country?.currency || "RUB"] || 1);
+    setInputCurrency(country?.currency || "RUR");
+    setExchangeRate(exchangeRates[country?.currency || "RUR"] || 1);
   }, [selectedCountry]);
 
   // Bank details fields
@@ -119,24 +119,24 @@ const WithdrawBlock = ({ symbol = "RUB" }) => {
   const [paymentPurpose, setPaymentPurpose] = useState("");
   const [documentFile, setDocumentFile] = useState<File | null>(null);
 
-  // Amount in RUB in Wei
+  // Amount in RUR in Wei
   const [amountInWei, setAmountInWei] = useState("0");
 
-  // Calculate amount in RUB when inputAmountForeign changes
+  // Calculate amount in RUR when inputAmountForeign changes
   useEffect(() => {
     if (inputAmountForeign === "") {
-      setCalculatedAmountRUB("0");
+      setCalculatedAmountRUR("0");
       setAmountInWei("0");
       return;
     }
     if (/^\d*\.?\d*$/.test(inputAmountForeign)) {
       try {
-        const amountRUB = (
+        const amountRUR = (
           parseFloat(inputAmountForeign) * exchangeRate
         ).toFixed(2);
-        setCalculatedAmountRUB(amountRUB);
+        setCalculatedAmountRUR(amountRUR);
 
-        const weiAmount = ethers.utils.parseEther(amountRUB);
+        const weiAmount = ethers.utils.parseEther(amountRUR);
         setAmountInWei(weiAmount.toString());
       } catch (error) {
         console.error("Error converting amount:", error);
@@ -163,7 +163,7 @@ const WithdrawBlock = ({ symbol = "RUB" }) => {
   
 
   const handleWithdraw = async () => {
-    const finputAmount = calculatedAmountRUB;
+    const finputAmount = calculatedAmountRUR;
     if (BigNumber.from(amountInWei).gt(balance.value)) {
       alert("Указанная сумма больше доступного баланса!");
       return;
@@ -282,13 +282,13 @@ const WithdrawBlock = ({ symbol = "RUB" }) => {
 
   return (
     <>
-      {symbol == "RUB" && isApproved && (
+      {symbol == "RUR" && isApproved && (
         <>
           <div className="withdraw-container">
-            {/* Display RUB balance */}
+            {/* Display RUR balance */}
             <div className="balance-info">
               <p>
-                Ваш баланс: {Number(balance?.displayValue || "0").toFixed(2)} RUB
+                Ваш баланс: {Number(balance?.displayValue || "0").toFixed(2)} RUR
               </p>
             </div>
 
@@ -323,10 +323,10 @@ const WithdrawBlock = ({ symbol = "RUB" }) => {
               />
             </div>
 
-            {/* Calculated RUB amount */}
+            {/* Calculated RUR amount */}
             <div className="field-group">
-              <label>Сумма в рублях (RUB):</label>
-              <Input type="text" value={calculatedAmountRUB} disabled />
+              <label>Сумма в рублях (RUR):</label>
+              <Input type="text" value={calculatedAmountRUR} disabled />
             </div>
 
             {/* Payment Purpose */}
@@ -471,7 +471,7 @@ const WithdrawBlock = ({ symbol = "RUB" }) => {
         </div>
       )}
 
-      {symbol != "RUB" && isApproved && (
+      {symbol != "RUR" && isApproved && (
         <div className="w-full flex flex-col gap-4">
           <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
             <p>

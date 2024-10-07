@@ -22,7 +22,7 @@ const DepositBlock = ({ symbol }) => {
     
   }, [user]);
 
-  // Payment details for RUB
+  // Payment details for RUR
   const paymentDetails = {
     name: 'ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ "ОПТИМУМСОФТ"',
     inn: "9703002368",
@@ -32,12 +32,12 @@ const DepositBlock = ({ symbol }) => {
     purpose: `Оплата по договору оферты №1000${userId} от 17.06.2024`,
   };
 
-  // Generate QR code data for RUB
+  // Generate QR code data for RUR
   const [qrCodeData, setQrCodeData] = useState("");
 
   useEffect(() => {
-    if (symbol?.toString() === "RUB" && isApproved) {
-      // Формируем данные для QR-кода для RUB
+    if (symbol?.toString() === "RUR" && isApproved) {
+      // Формируем данные для QR-кода для RUR
       const qrData = `ST00012|Name=${paymentDetails.name}|PersonalAcc=${paymentDetails.account}|BankName=${paymentDetails.bank}|BIC=${paymentDetails.bic}|CorrespAcc=30101810400000000225|PayeeINN=${paymentDetails.inn}|Purpose=${paymentDetails.purpose}`;
       setQrCodeData(qrData);
     }
@@ -48,7 +48,7 @@ const DepositBlock = ({ symbol }) => {
       <div className="deposit-container">
         <h2>Информация для пополнения счета</h2>
 
-        {symbol?.toString() === "RUB" ? (
+        {symbol?.toString() === "RUR" ? (
           <>
             {isApproved ? (
               <>
@@ -73,7 +73,7 @@ const DepositBlock = ({ symbol }) => {
                   </p>
                 </div>
 
-                {/* QR Code for RUB */}
+                {/* QR Code for RUR */}
                 {qrCodeData && (
                   <div className="qr-code">
                     <p>
@@ -110,7 +110,7 @@ const DepositBlock = ({ symbol }) => {
               </p>
             </div>
 
-            {/* QR Code for non-RUB currencies */}
+            {/* QR Code for non-RUR currencies */}
             {userAddress && (
               <div className="qr-code">
                 <p>

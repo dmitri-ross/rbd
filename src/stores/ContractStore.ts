@@ -3,7 +3,7 @@ import { makeAutoObservable } from "mobx";
 class ContractStore {
   contracts = [];
   balance = {
-    RUB: "0.00",
+    RUR: "0.00",
     USD: "0.00",
     CNY: "0.00",
   };

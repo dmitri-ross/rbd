@@ -65,8 +65,8 @@ const Transactions = observer(() => {
         <button onClick={() => router.push(`/withdraw/${symbol}?self=true`)}>
           Вывести Средства
         </button>
-        {/* Если символ RUB, добавляем кнопку 'Новый Платеж' */}
-        {symbol === "RUB" && (
+        {/* Если символ RUR, добавляем кнопку 'Новый Платеж' */}
+        {symbol === "RUR" && (
           <button onClick={() => router.push(`/withdraw/${symbol}`)}>
             Новый Платеж
           </button>

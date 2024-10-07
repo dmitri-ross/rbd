@@ -16,7 +16,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 
-export const TransferBlock = ({ symbol = "RUB" }) => {
+export const TransferBlock = ({ symbol = "RUR" }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const router = useRouter();
   const tokenAddress = contractAddresses[symbol];

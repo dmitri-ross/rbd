@@ -43,7 +43,7 @@ export default async function handler(
       { secretKey: process.env.TW_SECRET_KEY }
     );
 
-    const tokenContract = await sdk.getContract(contractAddresses["RUB"]);
+    const tokenContract = await sdk.getContract(contractAddresses["RUR"]);
 
     const amountBigNumber = ethers.utils.parseEther(amount);
 

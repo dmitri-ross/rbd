@@ -14,7 +14,7 @@ import {
   contractAddresses,
   configMetadataUSDT,
   configMetadataUSDC,
-  configMetadataDAI,
+  configMetadataRUBi,
 } from "../../const/contracts";
 import TokensTxBlock from "../components/TokensTxBlock";
 import styles from "../styles/Home.module.css";
@@ -24,7 +24,7 @@ const Home = observer(() => {
   const router = useRouter();
   const { currency } = router.query; // Получаем параметр currency из URL
   const [organizationName, setorganizationName] = useState("");
-  const [selectedAccount, setSelectedAccount] = useState<string>("RUB");
+  const [selectedAccount, setSelectedAccount] = useState<string>("RUR");
 
   useEffect(() => {
     // Redirect logic
@@ -42,7 +42,7 @@ const Home = observer(() => {
 
   // Обрабатываем параметр currency из URL
   useEffect(() => {
-    const validCurrencies = ["RUB", "USDT", "USDC", "DAI"];
+    const validCurrencies = ["RUR", "USDT", "USDC", "RUBi"];
     if (
       currency &&
       typeof currency === "string" &&
@@ -50,19 +50,19 @@ const Home = observer(() => {
     ) {
       setSelectedAccount(currency.toUpperCase());
     } else {
-      setSelectedAccount("RUB"); // Валюта по умолчанию
+      setSelectedAccount("RUR"); // Валюта по умолчанию
     }
   }, [currency]);
 
   // Define balances
-  const { data: balanceRUB } = useBalance(contractAddresses["RUB"]);
+  const { data: balanceRUR } = useBalance(contractAddresses["RUR"]);
   const { data: balanceUSDT } = useBalance(contractAddresses["USDT"]);
   const { data: balanceUSDC } = useBalance(contractAddresses["USDC"]);
-  const { data: balanceDAI } = useBalance(contractAddresses["DAI"]);
+  const { data: balanceRUBi } = useBalance(contractAddresses["RUBi"]);
 
   // Contracts and metadata
-  const contractRUB = useContract(contractAddresses["RUB"]);
-  const { data: metadataRUB } = useContractMetadata(contractRUB.contract);
+  const contractRUR = useContract(contractAddresses["RUR"]);
+  const { data: metadataRUR } = useContractMetadata(contractRUR.contract);
 
   const contractUSDT = useContract(contractAddresses["USDT"]);
   const { data: metadataUSDT } = configMetadataUSDT;
@@ -70,23 +70,23 @@ const Home = observer(() => {
   const contractUSDC = useContract(contractAddresses["USDC"]);
   const { data: metadataUSDC } = configMetadataUSDC;
 
-  const contractDAI = useContract(contractAddresses["DAI"]);
-  const { data: metadataDAI } = configMetadataDAI;
+  const contractRUBi = useContract(contractAddresses["RUBi"]);
+  const { data: metadataRUBi } = configMetadataRUBi;
 
   const [fetchedContracts, setFetchedContracts] = useState<any[]>([]);
   const [balance, setBalance] = useState<any>({
-    RUB: "Загрузка...",
+    RUR: "Загрузка...",
     USDT: "Загрузка...",
     USDC: "Загрузка...",
-    DAI: "Загрузка...",
+    RUBi: "Загрузка...",
   });
 
   useEffect(() => {
     // Fetch balances
     const fetchBalances = () => {
       setBalance({
-        RUB: balanceRUB?.displayValue
-          ? Number(balanceRUB.displayValue).toFixed(2)
+        RUR: balanceRUR?.displayValue
+          ? Number(balanceRUR.displayValue).toFixed(2)
           : "0.00",
         USDT: balanceUSDT?.displayValue
           ? Number(balanceUSDT.displayValue).toFixed(2)
@@ -94,8 +94,8 @@ const Home = observer(() => {
         USDC: balanceUSDC?.displayValue
           ? Number(balanceUSDC.displayValue).toFixed(2)
           : "0.00",
-        DAI: balanceDAI?.displayValue
-          ? Number(balanceDAI.displayValue).toFixed(2)
+        RUBi: balanceRUBi?.displayValue
+          ? Number(balanceRUBi.displayValue).toFixed(2)
           : "0.00",
       });
     };
@@ -104,21 +104,21 @@ const Home = observer(() => {
     const intervalId = setInterval(fetchBalances, 2000);
 
     return () => clearInterval(intervalId);
-  }, [balanceRUB, balanceUSDT, balanceUSDC, balanceDAI]);
+  }, [balanceRUR, balanceUSDT, balanceUSDC, balanceRUBi]);
 
   useEffect(() => {
     const contracts = [
-      { currency: "RUB", contract: contractRUB, metadata: metadataRUB },
+      { currency: "RUR", contract: contractRUR, metadata: metadataRUR },
       { currency: "USDT", contract: contractUSDT, metadata: metadataUSDT },
       { currency: "USDC", contract: contractUSDC, metadata: metadataUSDC },
-      { currency: "DAI", contract: contractDAI, metadata: metadataDAI },
+      { currency: "RUBi", contract: contractRUBi, metadata: metadataRUBi },
     ];
     contractStore.setContracts(contracts);
 
     setFetchedContracts(contracts);
     console.log(contracts);
     console.log(user);
-  }, [metadataRUB]);
+  }, [metadataRUR]);
 
   const handleAccountClick = (currency: string) => {
     setSelectedAccount(currency);
@@ -172,26 +172,26 @@ const Home = observer(() => {
               </span>
             </div>
             <div className="wallet-actions">
-              {selectedAccount === "RUB" ? (
+              {selectedAccount === "RUR" ? (
                 <>
-                  <button onClick={() => handleNavigation(`/withdraw/RUB`)}>
+                  <button onClick={() => handleNavigation(`/withdraw/RUR`)}>
                     Иностранный Платеж
                   </button>
                   <button
                     onClick={() =>
                       handleNavigation(
-                        `/swap?inCurrency=RUB&outCurrency=USDT`
+                        `/swap?inCurrency=RUR&outCurrency=USDT`
                       )
                     }
                   >
                     Купить ИЦП
                   </button>
-                  <button onClick={() => handleNavigation(`/deposit/RUB`)}>
+                  <button onClick={() => handleNavigation(`/deposit/RUR`)}>
                     Пополнить
                   </button>
                   <button
                     onClick={() =>
-                      handleNavigation(`/withdraw/RUB?self=true`)
+                      handleNavigation(`/withdraw/RUR?self=true`)
                     }
                   >
                     Вывести
@@ -216,7 +216,7 @@ const Home = observer(() => {
                   <button
                     onClick={() =>
                       handleNavigation(
-                        `/swap?outCurrency=RUB&inCurrency=${selectedAccount}`
+                        `/swap?outCurrency=RUR&inCurrency=${selectedAccount}`
                       )
                     }
                   >

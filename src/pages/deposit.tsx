@@ -9,15 +9,15 @@ import { useContract, useContractMetadata, useUser } from "@thirdweb-dev/react";
 import { observer } from "mobx-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { contractAddresses, configMetadataUSDT, configMetadataUSDC, configMetadataDAI } from "../../const/contracts";
+import { contractAddresses, configMetadataUSDT, configMetadataUSDC, configMetadataRUBi } from "../../const/contracts";
 import { Breadcrumbs, BreadcrumbItem } from "@nextui-org/react";
 
 const Deposit = observer(() => {
   const { user, isLoggedIn, isLoading } = useUser();
   const router = useRouter();
 
-  const contractRUB = useContract(contractAddresses["RUB"]);
-  const metadataRUB = useContractMetadata(contractRUB.contract);
+  const contractRUR = useContract(contractAddresses["RUR"]);
+  const metadataRUR = useContractMetadata(contractRUR.contract);
 
   const contractUSDT = useContract(contractAddresses["USDT"]);
   const metadataUSDT = configMetadataUSDT;
@@ -25,22 +25,22 @@ const Deposit = observer(() => {
   const contractUSDC = useContract(contractAddresses["USDC"]);
   const metadataUSDC = configMetadataUSDC;
 
-  const contractDAI = useContract(contractAddresses["DAI"]);
-  const metadataDAI = configMetadataDAI;
+  const contractRUBi = useContract(contractAddresses["RUBi"]);
+  const metadataRUBi = configMetadataRUBi;
 
   const [fetchedContracts, setFetchedContracts] = useState([]);
 
   useEffect(() => {
     const contracts = [
-      { currency: "RUB", contract: contractRUB, metadata: metadataRUB },
+      { currency: "RUR", contract: contractRUR, metadata: metadataRUR },
       { currency: "USDT", contract: contractUSDT, metadata: metadataUSDT },
       { currency: "USDC", contract: contractUSDC, metadata: metadataUSDC },
-      { currency: "DAI", contract: contractDAI, metadata: metadataDAI },
+      { currency: "RUBi", contract: contractRUBi, metadata: metadataRUBi },
     ];
 
     contractStore.setContracts(contracts);
     setFetchedContracts(contracts);
-  }, [contractRUB.contract, contractUSDT.contract, contractUSDC.contract, contractDAI.contract]);
+  }, [contractRUR.contract, contractUSDT.contract, contractUSDC.contract, contractRUBi.contract]);
 
   return (
     <div className={styles.container}>
@@ -53,7 +53,7 @@ const Deposit = observer(() => {
         {/* Раздел для ИЦП */}
         <h3>Токены ИЦП:</h3>
         {fetchedContracts
-          .filter(({ currency }) => ["USDT", "USDC", "DAI"].includes(currency))
+          .filter(({ currency }) => ["USDT", "USDC", "RUBi"].includes(currency))
           .map((contract, index) => (
             <CurrencyButton
               key={index}
@@ -66,7 +66,7 @@ const Deposit = observer(() => {
         {/* Раздел для Токенизированных депозитов */}
         <h3>Токенизированные Депозиты:</h3>
         {fetchedContracts
-          .filter(({ currency }) => ["RUB"].includes(currency))
+          .filter(({ currency }) => ["RUR"].includes(currency))
           .map((contract, index) => (
             <CurrencyButton
               key={index}

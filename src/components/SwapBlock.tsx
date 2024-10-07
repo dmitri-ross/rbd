@@ -34,16 +34,16 @@ const SwapBlock = () => {
 
   const { inCurrency, outCurrency } = router.query;
 
-  const tokenOptions = ["RUB", "USDC", "DAI", "USDT"];
+  const tokenOptions = ["RUR", "USDC", "RUBi", "USDT"];
   const tokenSymbols: { [key: string]: string } = {
-    RUB: "RUBi",
+    RUR: "RURi",
     USDC: "USDC",
-    DAI: "DAI",
+    RUBi: "RUBi",
     USDT: "USDT",
   };
 
   const [fromToken, setFromToken] = useState<string>("USDT");
-  const [toToken, setToToken] = useState<string>("RUB");
+  const [toToken, setToToken] = useState<string>("RUR");
   const [inputAmount, setInputAmount] = useState<string>("");
   const [amountInWei, setAmountInWei] = useState<BigNumber>(
     BigNumber.from("0")
@@ -62,7 +62,7 @@ const SwapBlock = () => {
   useEffect(() => {
     console.log( inCurrency, outCurrency );
     // Допустимые валюты
-    const validTokens = ["RUB", "USDC", "DAI", "USDT"];
+    const validTokens = ["RUR", "USDC", "RUBi", "USDT"];
 
     // Проверяем и устанавливаем fromToken
     if (
@@ -83,7 +83,7 @@ const SwapBlock = () => {
     ) {
       setToToken(outCurrency.toUpperCase());
     } else {
-      setToToken("RUB"); // Значение по умолчанию
+      setToToken("RUR"); // Значение по умолчанию
     }
     
     console.log(fromToken, toToken);

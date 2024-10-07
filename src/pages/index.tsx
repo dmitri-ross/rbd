@@ -1,6 +1,6 @@
 // pages/index.tsx
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import {
   useBalance,
@@ -25,6 +25,9 @@ const Home = observer(() => {
   const { currency } = router.query; // Получаем параметр currency из URL
   const [organizationName, setorganizationName] = useState("");
   const [selectedAccount, setSelectedAccount] = useState<string>("RUR");
+
+  // Создаем реф для блока "Текущий баланс"
+  const currentBalanceRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Redirect logic
@@ -124,6 +127,11 @@ const Home = observer(() => {
     setSelectedAccount(currency);
     console.log(currency);
     router.push(`/?currency=${currency}`, undefined, { shallow: true });
+
+    // Плавно прокручиваем к блоку "Текущий баланс"
+    if (currentBalanceRef.current) {
+      currentBalanceRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   const handleNavigation = (url: string) => {
@@ -162,7 +170,7 @@ const Home = observer(() => {
       </div>
 
       {/* Блок текущего баланса */}
-      <div className="current-balance-section">
+      <div className="current-balance-section" ref={currentBalanceRef}>
         <h2>Текущий баланс:</h2>
         <div className="wallet-card">
           <div className="wallet-info">

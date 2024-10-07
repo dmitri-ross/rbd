@@ -82,7 +82,7 @@ export const TransferBlock = ({ symbol = "RUR" }) => {
 
   const handleCloseModal = () => {
     onOpenChange();
-    router.push(`/transactions/${symbol}`);
+    router.push(`/?currency=${symbol}`);
   };
 
   return (

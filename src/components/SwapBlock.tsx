@@ -259,7 +259,7 @@ const SwapBlock = () => {
 
   const handleCloseModal = () => {
     onOpenChange();
-    router.push(`/transactions/${toToken}`);
+    router.push(`/?currency=${toToken}`);
   };
 
   const handleSwapTokens = () => {

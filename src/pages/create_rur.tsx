@@ -17,7 +17,7 @@ const CreateRur = () => {
 
   useEffect(() => {
     if (user && user.data) {
-      const userData = user.data;
+      const userData:any = user.data;
       if (
         userData.isApproved === false &&
         userData.organizationName &&

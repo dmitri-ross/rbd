@@ -3,11 +3,11 @@ import { en} from "@thirdweb-dev/react";
 const russian = en( {
     connectWallet: {
         signIn: "Войти",
-        defaultButtonTitle: "Подключить кошелек",
-        connecting: "Подключение",
+        defaultButtonTitle: "Войти",
+        connecting: "Вход",
         switchNetwork: "Сменить сеть",
         switchingNetwork: "Переключение сети",
-        defaultModalTitle: "Подключение",
+        defaultModalTitle: "Вход",
         recommended: "Рекомендуемые",
         installed: "Установлено",
         continueAsGuest: "Продолжить как гость",
@@ -25,9 +25,9 @@ const russian = en( {
         guestWalletWarning:
           "Это временный гостевой кошелек. Сделайте резервную копию, если не хотите потерять доступ",
         switchTo: "Переключиться на",
-        connectedToSmartWallet: "Подключено к умному аккаунту",
+        connectedToSmartWallet: "Подключено",
         confirmInWallet: "Подтвердите в кошельке",
-        disconnectWallet: "Отключить кошелек",
+        disconnectWallet: "Выйти",
         copyAddress: "Копировать адрес",
         personalWallet: "Личный кошелек",
         smartWallet: "Умный аккаунт",
@@ -91,7 +91,7 @@ const russian = en( {
             disconnectWallet: "Отключить кошелек",
           },
           signingScreen: {
-            title: "Подписание",
+            title: "Вход...",
             prompt: "Подпишите запрос подписи в вашем кошельке",
             promptForSafe: "Подпишите запрос подписи в вашем кошельке и утвердите транзакцию в Safe",
             approveTransactionInSafe: "Утвердить транзакцию в Safe",
@@ -106,11 +106,11 @@ const russian = en( {
           scanInstruction: "Отсканируйте это с помощью приложения вашего кошелька, чтобы подключиться",
         },
         smartWallet: {
-          connecting: "Подключение к умному аккаунту",
+          connecting: "Подключение к аккаунту",
           failedToConnect: "Не удалось подключиться к умному аккаунту",
           wrongNetworkScreen: {
-            title: "Неверная сеть",
-            subtitle: "Ваш кошелек не подключен к нужной сети",
+            title: "Подключение...",
+            subtitle: "",
             failedToSwitch: "Не удалось переключить сеть",
           },
         },

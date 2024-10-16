@@ -1,5 +1,6 @@
 import { AccountHeader } from "@/components/AccountHeader";
 import { BackButton } from "@/components/BackButton";
+
 import { ConnectBlock } from "@/components/ConnectBlock";
 import { CurrencyButton } from "@/components/CurrencyButton";
 import { Header } from "@/components/Header";

@@ -30,7 +30,7 @@ export const { ThirdwebAuthHandler, getUser } = ThirdwebAuth({
         return {
           ...userSession,
           userId: user.id || 0,
-          isApproved: true,//user.is_approved || false,
+          isApproved: user.is_approved || false,
           businessName: user.business_name,
           organizationName: user.organization_name,
           inn: user.inn,
@@ -42,6 +42,7 @@ export const { ThirdwebAuthHandler, getUser } = ThirdwebAuth({
           identityDocumentIpfs: user.identity_document_ipfs,
           contactEmail: user.contact_email,
           contactPhone: user.contact_phone,
+          isTos: user.is_tos,
         };
       }
       return {

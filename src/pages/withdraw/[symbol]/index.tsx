@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useUser } from "@thirdweb-dev/react";
 import WithdrawBlock from "@/components/WithdrawBlock";
-
+import { BackButton } from "@/components/BackButton";
 export default function Withdraw() {
   
   const router = useRouter();
@@ -23,6 +23,8 @@ export default function Withdraw() {
   return (
     <>
       <div className="dashboard-header">
+     
+      <BackButton />
         {isSelf ? 
         <h1>Вывод средств</h1>
         :

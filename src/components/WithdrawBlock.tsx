@@ -39,7 +39,7 @@ const WithdrawBlock = ({ symbol = "RUR" }) => {
   const address = useAddress();
   const sdk = useSDK();
   const { contract: withdrawContract } = useContract(withdrawContractAddress);
-  const { data: balance } = useBalance(contractAddresses["RUR"]); // Fetch RUR balance
+  const { data: balance } = useBalance(tokenAddress); // Fetch balance for selected token
 
   const [dots, setDots] = useState("");
   const [tokenContract, setTokenContract] = useState(null);
@@ -84,8 +84,8 @@ const WithdrawBlock = ({ symbol = "RUR" }) => {
   const [selectedCountry, setSelectedCountry] = useState("RU"); // Default to Russia
   const [inputCurrency, setInputCurrency] = useState("RUR"); // Default to RUR
   const [inputAmountForeign, setInputAmountForeign] = useState(""); // Amount in foreign currency
-  const [exchangeRate, setExchangeRate] = useState(1); // Exchange rate to RUR
-  const [calculatedAmountRUR, setCalculatedAmountRUR] = useState("0"); // Amount in RUR
+  const [exchangeRate, setExchangeRate] = useState(1); // Exchange rate to selected token
+  const [calculatedAmountToken, setCalculatedAmountToken] = useState("0"); // Amount in selected token
 
   // Define countries and currencies
   const countries = [
@@ -95,20 +95,41 @@ const WithdrawBlock = ({ symbol = "RUR" }) => {
     { code: "TR", name: "Турция", currency: "TRY" },
   ];
 
-  // Exchange rates to RUR
+  // Exchange rates to selected token
   const exchangeRates = {
-    RUR: 1, // 1 RUR = 1 RUR
-    CNY: 14, // 1 CNY = 14 RUR
-    AED: 20, // 1 AED = 20 RUR
-    TRY: 3, // 1 TRY = 3 RUR
+    RUR: {
+      RUR: 1,
+      CNY: 14, // 1 CNY = 14 RUR
+      AED: 20, // 1 AED = 20 RUR
+      TRY: 3,  // 1 TRY = 3 RUR
+    },
+    USDT: {
+      RUR: 0.01,
+      CNY: 0.142857, // 1 CNY = 0.142857 USDT (1 USDT = 7 CNY)
+      AED: 0.27248,  // 1 AED = 0.27248 USDT (1 USDT = 3.67 AED)
+      TRY: 0.037037, // 1 TRY = 0.037037 USDT (1 USDT = 27 TRY)
+    },
+    USDC: {
+      RUR: 0.01,
+      CNY: 0.142857,
+      AED: 0.27248,
+      TRY: 0.037037,
+    },
+    RUBi: {
+      RUR: 1,
+      CNY: 14,
+      AED: 20,
+      TRY: 3,
+    },
   };
 
-  // Update exchange rate based on selected currency
+  // Update exchange rate based on selected country and symbol
   useEffect(() => {
     const country = countries.find((c) => c.code === selectedCountry);
-    setInputCurrency(country?.currency || "RUR");
-    setExchangeRate(exchangeRates[country?.currency || "RUR"] || 1);
-  }, [selectedCountry]);
+    const currency = country?.currency || "RUR";
+    setInputCurrency(currency);
+    setExchangeRate(exchangeRates[symbol][currency] || 1);
+  }, [selectedCountry, symbol]);
 
   // Bank details fields
   const [bankName, setBankName] = useState("");
@@ -119,30 +140,31 @@ const WithdrawBlock = ({ symbol = "RUR" }) => {
   const [paymentPurpose, setPaymentPurpose] = useState("");
   const [documentFile, setDocumentFile] = useState<File | null>(null);
 
-  // Amount in RUR in Wei
+  // Amount in selected token in Wei
   const [amountInWei, setAmountInWei] = useState("0");
 
-  // Calculate amount in RUR when inputAmountForeign changes
+  // Calculate amount in selected token when inputAmountForeign changes
   useEffect(() => {
     if (inputAmountForeign === "") {
-      setCalculatedAmountRUR("0");
+      setCalculatedAmountToken("0");
       setAmountInWei("0");
       return;
     }
     if (/^\d*\.?\d*$/.test(inputAmountForeign)) {
       try {
-        const amountRUR = (
+        const amountToken = (
           parseFloat(inputAmountForeign) * exchangeRate
-        ).toFixed(2);
-        setCalculatedAmountRUR(amountRUR);
+        ).toFixed(6); // Adjust decimal places as needed
+        setCalculatedAmountToken(amountToken);
 
-        const weiAmount = ethers.utils.parseEther(amountRUR);
+        const decimals = balance?.decimals || 18;
+        const weiAmount = ethers.utils.parseUnits(amountToken, decimals);
         setAmountInWei(weiAmount.toString());
       } catch (error) {
         console.error("Error converting amount:", error);
       }
     }
-  }, [inputAmountForeign, exchangeRate]);
+  }, [inputAmountForeign, exchangeRate, balance]);
 
   const sendTransactionDetailsToAPI = async (transactionDetails) => {
     try {
@@ -151,19 +173,18 @@ const WithdrawBlock = ({ symbol = "RUR" }) => {
         formData.append(key, transactionDetails[key]);
       }
       if (documentFile) {
-        formData.append('document', documentFile);
+        formData.append("document", documentFile);
       }
-  
-      const response = await axios.post('/api/transaction-success', formData);
-      console.log('API response:', response.data);
+
+      const response = await axios.post("/api/transaction-success", formData);
+      console.log("API response:", response.data);
     } catch (error) {
-      console.error('Error sending transaction details:', error);
+      console.error("Error sending transaction details:", error);
     }
   };
-  
 
   const handleWithdraw = async () => {
-    const finputAmount = calculatedAmountRUR;
+    const finputAmount = calculatedAmountToken;
     if (BigNumber.from(amountInWei).gt(balance.value)) {
       alert("Указанная сумма больше доступного баланса!");
       return;
@@ -222,7 +243,7 @@ const WithdrawBlock = ({ symbol = "RUR" }) => {
       const tx = await withdrawTokens({
         args: [tokenAddress, BigNumber.from(amountInWei), encryptedDetails],
       });
-      
+
       console.log("Withdrawal successful");
 
       // Send transaction details to API
@@ -238,7 +259,7 @@ const WithdrawBlock = ({ symbol = "RUR" }) => {
         iban,
         country: selectedCountry,
         paymentPurpose,
-        txHash: tx.receipt.transactionHash, // Replace with actual transaction hash if available
+        txHash: tx.receipt.transactionHash,
       });
 
       onOpen();
@@ -280,15 +301,22 @@ const WithdrawBlock = ({ symbol = "RUR" }) => {
     }
   }, [isSelf, userId]);
 
+  // Determine if withdrawal is allowed
+  const canWithdraw =
+    isApproved &&
+    ((symbol === "RUR" && isSelf === true) ||
+      (["USDT", "USDC", "RUBi"].includes(symbol) && isSelf === false));
+
   return (
     <>
-      {symbol == "RUR" && isApproved && (
+      {canWithdraw && (
         <>
           <div className="withdraw-container">
-            {/* Display RUR balance */}
+            {/* Display balance */}
             <div className="balance-info">
               <p>
-                Ваш баланс: {Number(balance?.displayValue || "0").toFixed(2)} RUR
+                Ваш баланс: {Number(balance?.displayValue || "0").toFixed(6)}{" "}
+                {symbol}
               </p>
             </div>
 
@@ -323,10 +351,10 @@ const WithdrawBlock = ({ symbol = "RUR" }) => {
               />
             </div>
 
-            {/* Calculated RUR amount */}
+            {/* Calculated amount in selected token */}
             <div className="field-group">
-              <label>Сумма в рублях (RUR):</label>
-              <Input type="text" value={calculatedAmountRUR} disabled />
+              <label>Сумма в {symbol}:</label>
+              <Input type="text" value={calculatedAmountToken} disabled />
             </div>
 
             {/* Payment Purpose */}
@@ -471,7 +499,7 @@ const WithdrawBlock = ({ symbol = "RUR" }) => {
         </div>
       )}
 
-      {symbol != "RUR" && isApproved && (
+      {!canWithdraw && isApproved && (
         <div className="w-full flex flex-col gap-4">
           <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
             <p>

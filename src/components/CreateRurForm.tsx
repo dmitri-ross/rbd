@@ -1,4 +1,4 @@
-// components/ProfileForm.tsx
+// components/CreateRurForm.tsx
 
 import { useState, useEffect } from "react";
 import styles from "@/styles/Profile.module.css";
@@ -6,10 +6,8 @@ import { Button, Input, Textarea } from "@nextui-org/react";
 import axios from "axios";
 import { useUser } from "@thirdweb-dev/react";
 
-const ProfileForm = ({ onSubmit }) => {
+const CreateRurForm = ({ onSubmit }) => {
   const { user } = useUser();
-
-  const [isApproved, setUserIsApproved] = useState(false);
 
   const [organizationName, setOrganizationName] = useState("");
   const [inn, setInn] = useState("");
@@ -26,34 +24,8 @@ const ProfileForm = ({ onSubmit }) => {
   const [identityDocument, setIdentityDocument] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [existingDocuments, setExistingDocuments] = useState({
-    deedOfEstablishment: "",
-    articlesOfAssociation: "",
-    proofOfCapacity: "",
-    identityDocument: "",
-  });
-
-  useEffect(() => {
-    const userDatawithData: any = user;
-
-    if (userDatawithData && userDatawithData.data) {
-      const userData = userDatawithData.data;
-      setOrganizationName(userData.organizationName || "");
-      setInn(userData.inn || "");
-      setDomicile(userData.domicile || "");
-      setLegalRepresentativeName(userData.legalRepresentativeName || "");
-      setContactEmail(userData.contactEmail || "");
-      setContactPhone(userData.contactPhone || "");
-
-      setExistingDocuments({
-        deedOfEstablishment: userData.deedOfEstablishmentIpfs || "",
-        articlesOfAssociation: userData.articlesOfAssociationIpfs || "",
-        proofOfCapacity: userData.proofOfCapacityIpfs || "",
-        identityDocument: userData.identityDocumentIpfs || "",
-      });
-      setUserIsApproved(userData.isApproved);
-    }
-  }, [user]);
+  const [agreePersonalData, setAgreePersonalData] = useState(false);
+  const [confirmRepresentative, setConfirmRepresentative] = useState(false);
 
   // Валидация полей формы
   const validate = () => {
@@ -63,7 +35,8 @@ const ProfileForm = ({ onSubmit }) => {
     if (!inn) newErrors.inn = "Введите ИНН.";
     if (!domicile) newErrors.domicile = "Введите юридический адрес.";
     if (!legalRepresentativeName)
-      newErrors.legalRepresentativeName = "Введите имя законного представителя.";
+      newErrors.legalRepresentativeName =
+        "Введите имя законного представителя.";
     if (!contactEmail) {
       newErrors.contactEmail = "Введите контактный email.";
     } else if (!/\S+@\S+\.\S+/.test(contactEmail)) {
@@ -75,16 +48,25 @@ const ProfileForm = ({ onSubmit }) => {
       newErrors.contactPhone = "Введите корректный телефонный номер.";
     }
 
-    // Проверяем необходимость загрузки документов
-    if (!existingDocuments.deedOfEstablishment && !deedOfEstablishment)
+    // Проверяем загрузку документов
+    if (!deedOfEstablishment)
       newErrors.deedOfEstablishment = "Загрузите учредительный документ.";
-    if (!existingDocuments.articlesOfAssociation && !articlesOfAssociation)
+    if (!articlesOfAssociation)
       newErrors.articlesOfAssociation = "Загрузите устав.";
-    if (!existingDocuments.proofOfCapacity && !proofOfCapacity)
+    if (!proofOfCapacity)
       newErrors.proofOfCapacity = "Загрузите подтверждение полномочий.";
-    if (!existingDocuments.identityDocument && !identityDocument)
+    if (!identityDocument)
       newErrors.identityDocument =
         "Загрузите документ, удостоверяющий личность.";
+
+    // Проверяем согласие с обработкой персональных данных
+    if (!agreePersonalData)
+      newErrors.agreePersonalData = "Вы должны дать согласие на обработку персональных данных.";
+
+    // Проверяем подтверждение законного представительства
+    if (!confirmRepresentative)
+      newErrors.confirmRepresentative =
+        "Вы должны подтвердить, что являетесь законным представителем.";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -107,7 +89,7 @@ const ProfileForm = ({ onSubmit }) => {
       formData.append("contactEmail", contactEmail);
       formData.append("contactPhone", contactPhone);
 
-      // Добавляем только новые документы в FormData
+      // Добавляем документы в FormData
       if (deedOfEstablishment) {
         formData.append("deedOfEstablishment", deedOfEstablishment);
       }
@@ -134,7 +116,7 @@ const ProfileForm = ({ onSubmit }) => {
       // Обработка успешного ответа
       onSubmit(response.data);
     } catch (error) {
-      console.error("Ошибка при отправке профиля:", error);
+      console.error("Ошибка при отправке заявки:", error);
       // Здесь вы можете установить сообщения об ошибках для отображения пользователю
     } finally {
       setUploading(false);
@@ -152,7 +134,6 @@ const ProfileForm = ({ onSubmit }) => {
           placeholder="Введите название организации"
           value={organizationName}
           onChange={(e) => setOrganizationName(e.target.value)}
-          disabled={isApproved}
         />
         {errors.organizationName && (
           <p className={styles.error}>{errors.organizationName}</p>
@@ -168,7 +149,6 @@ const ProfileForm = ({ onSubmit }) => {
           placeholder="Введите ИНН"
           value={inn}
           onChange={(e) => setInn(e.target.value)}
-          disabled={isApproved}
         />
         {errors.inn && <p className={styles.error}>{errors.inn}</p>}
       </div>
@@ -182,7 +162,6 @@ const ProfileForm = ({ onSubmit }) => {
           placeholder="Введите юридический адрес"
           value={domicile}
           onChange={(e) => setDomicile(e.target.value)}
-          disabled={isApproved}
         />
         {errors.domicile && <p className={styles.error}>{errors.domicile}</p>}
       </div>
@@ -198,7 +177,6 @@ const ProfileForm = ({ onSubmit }) => {
           placeholder="Введите имя законного представителя"
           value={legalRepresentativeName}
           onChange={(e) => setLegalRepresentativeName(e.target.value)}
-          disabled={isApproved}
         />
         {errors.legalRepresentativeName && (
           <p className={styles.error}>{errors.legalRepresentativeName}</p>
@@ -215,7 +193,6 @@ const ProfileForm = ({ onSubmit }) => {
           placeholder="example@domain.com"
           value={contactEmail}
           onChange={(e) => setContactEmail(e.target.value)}
-          disabled={isApproved}
         />
         {errors.contactEmail && (
           <p className={styles.error}>{errors.contactEmail}</p>
@@ -232,7 +209,6 @@ const ProfileForm = ({ onSubmit }) => {
           placeholder="+7 (495) 123-45-67"
           value={contactPhone}
           onChange={(e) => setContactPhone(e.target.value)}
-          disabled={isApproved}
         />
         {errors.contactPhone && (
           <p className={styles.error}>{errors.contactPhone}</p>
@@ -242,11 +218,6 @@ const ProfileForm = ({ onSubmit }) => {
       {/* Документы */}
       <div className={styles.formGroup}>
         <label htmlFor="deedOfEstablishment">Учредительный документ:</label>
-        {existingDocuments.deedOfEstablishment ? (
-          <p>
-            Документ уже загружен. Вы можете загрузить новый, чтобы заменить его.
-          </p>
-        ) : null}
         <input
           id="deedOfEstablishment"
           type="file"
@@ -255,7 +226,6 @@ const ProfileForm = ({ onSubmit }) => {
             setDeedOfEstablishment(e.target.files ? e.target.files[0] : null)
           }
           className={styles.fileInput}
-          disabled={isApproved}
         />
         {errors.deedOfEstablishment && (
           <p className={styles.error}>{errors.deedOfEstablishment}</p>
@@ -264,11 +234,6 @@ const ProfileForm = ({ onSubmit }) => {
 
       <div className={styles.formGroup}>
         <label htmlFor="articlesOfAssociation">Устав:</label>
-        {existingDocuments.articlesOfAssociation ? (
-          <p>
-            Документ уже загружен. Вы можете загрузить новый, чтобы заменить его.
-          </p>
-        ) : null}
         <input
           id="articlesOfAssociation"
           type="file"
@@ -277,7 +242,6 @@ const ProfileForm = ({ onSubmit }) => {
             setArticlesOfAssociation(e.target.files ? e.target.files[0] : null)
           }
           className={styles.fileInput}
-          disabled={isApproved}
         />
         {errors.articlesOfAssociation && (
           <p className={styles.error}>{errors.articlesOfAssociation}</p>
@@ -286,11 +250,6 @@ const ProfileForm = ({ onSubmit }) => {
 
       <div className={styles.formGroup}>
         <label htmlFor="proofOfCapacity">Подтверждение полномочий:</label>
-        {existingDocuments.proofOfCapacity ? (
-          <p>
-            Документ уже загружен. Вы можете загрузить новый, чтобы заменить его.
-          </p>
-        ) : null}
         <input
           id="proofOfCapacity"
           type="file"
@@ -299,7 +258,6 @@ const ProfileForm = ({ onSubmit }) => {
             setProofOfCapacity(e.target.files ? e.target.files[0] : null)
           }
           className={styles.fileInput}
-          disabled={isApproved}
         />
         {errors.proofOfCapacity && (
           <p className={styles.error}>{errors.proofOfCapacity}</p>
@@ -310,11 +268,6 @@ const ProfileForm = ({ onSubmit }) => {
         <label htmlFor="identityDocument">
           Документ, удостоверяющий личность:
         </label>
-        {existingDocuments.identityDocument ? (
-          <p>
-            Документ уже загружен. Вы можете загрузить новый, чтобы заменить его.
-          </p>
-        ) : null}
         <input
           id="identityDocument"
           type="file"
@@ -323,22 +276,53 @@ const ProfileForm = ({ onSubmit }) => {
             setIdentityDocument(e.target.files ? e.target.files[0] : null)
           }
           className={styles.fileInput}
-          disabled={isApproved}
         />
         {errors.identityDocument && (
           <p className={styles.error}>{errors.identityDocument}</p>
         )}
       </div>
 
+      {/* Чекбокс согласия с обработкой персональных данных */}
+      <div className={styles.formGroupCheckbox}>
+        <input
+          type="checkbox"
+          id="agreePersonalData"
+          checked={agreePersonalData}
+          onChange={(e) => setAgreePersonalData(e.target.checked)}
+        />
+        <label htmlFor="agreePersonalData">
+          Я согласен на обработку персональных данных
+        </label>
+        {errors.agreePersonalData && (
+          <p className={styles.error}>{errors.agreePersonalData}</p>
+        )}
+      </div>
+
+      {/* Чекбокс подтверждения законного представительства */}
+      <div className={styles.formGroupCheckbox}>
+        <input
+          type="checkbox"
+          id="confirmRepresentative"
+          checked={confirmRepresentative}
+          onChange={(e) => setConfirmRepresentative(e.target.checked)}
+        />
+        <label htmlFor="confirmRepresentative">
+          Я подтверждаю, что являюсь законным представителем юридического или физического лица
+        </label>
+        {errors.confirmRepresentative && (
+          <p className={styles.error}>{errors.confirmRepresentative}</p>
+        )}
+      </div>
+
       <Button
         type="submit"
-        disabled={uploading || isApproved}
+        disabled={uploading}
         className={styles.submitButton}
       >
-        {uploading ? "Загрузка..." : "Сохранить"}
+        {uploading ? "Отправка..." : "Подать заявку"}
       </Button>
     </form>
   );
 };
 
-export default ProfileForm;
+export default CreateRurForm;

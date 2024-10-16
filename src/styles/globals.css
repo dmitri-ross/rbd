@@ -1578,7 +1578,7 @@ header .user-info a:hover {
   color: red;
 }
 .current-balance-section {
-  margin-top: 40px;
+   margin-top: 20px; 
 }
 
 .wallet-details {
@@ -1650,4 +1650,11 @@ header .user-info a:hover {
   font-size: 16px;
   font-weight: bold;
   color:#fff
+}
+pre{
+  white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }

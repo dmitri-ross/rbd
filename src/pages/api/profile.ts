@@ -6,6 +6,28 @@ import fs from 'fs';
 import { ThirdwebSDK } from '@thirdweb-dev/sdk';
 import { getUser } from '../../../auth.config';
 import { updateUser } from '@/util/user';
+import axios from 'axios';
+
+
+async function sendMessageToTelegram(organizationName: string) {
+  const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;  // Ensure this is set in your .env.local
+  const CHAT_ID = process.env.TELEGRAM_CHAT_ID;      // Ensure this is set in your .env.local
+
+  const text = `Новая заявка на открытие счета! ${organizationName}`;
+//- Transaction Hash: ${transactionHash}
+  try {
+    await axios.get(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      params: {
+        chat_id: CHAT_ID,
+        text,
+        parse_mode: 'Markdown'
+      }
+    });
+  } catch (error) {
+    console.error('Error sending message to Telegram:', error);
+    throw new Error('Failed to send message to Telegram');
+  }
+}
 
 export const config = {
   api: {
@@ -133,7 +155,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Обновление пользователя в базе данных
     const updatedUser = await updateUser(user.address, profileData);
-
+    sendMessageToTelegram(organizationName) 
     // Ответ об успешном обновлении
     res.status(200).json({
       message: 'Профиль успешно обновлен!',

@@ -7,7 +7,6 @@ import {
   useContract,
   useContractMetadata,
   useUser,
-  useAuth,
 } from "@thirdweb-dev/react";
 import { observer } from "mobx-react-lite";
 import contractStore from "@/stores/ContractStore";
@@ -20,12 +19,12 @@ import {
 import TokensTxBlock from "../components/TokensTxBlock";
 import { motion, AnimatePresence } from "framer-motion";
 import AgreementModal from "../components/AgreementModal"; // Импортируем новый компонент
+import useIsMobile from "../hooks/useIsMobile"; // Импортируем хук
 
 import styles from "../styles/Home.module.css";
 
 const Home = observer(() => {
   const { user, isLoggedIn, isLoading } = useUser();
-
   const router = useRouter();
   const { currency } = router.query;
   const [organizationName, setOrganizationName] = useState("");
@@ -33,6 +32,23 @@ const Home = observer(() => {
   const [userApproved, setUserApproved] = useState<boolean>(false);
   const [defaultAccount, setDefaultAccount] = useState<string>("USDT");
   const currentBalanceRef = useRef<HTMLDivElement>(null);
+  const [sentRequest, setUserSentRequest] = useState(false);
+
+  // Используем хук для определения, является ли устройство мобильным
+  const isMobile = useIsMobile();
+
+  useEffect(() => {
+    if (user && user.data) {
+      const userData: any = user.data;
+      if (
+        userData.isApproved === false &&
+        userData.organizationName &&
+        userData.organizationName.length > 2
+      ) {
+        setUserSentRequest(true);
+      }
+    }
+  }, [user]);
 
   // Состояние для модального окна
   const [showTosModal, setShowTosModal] = useState(false);
@@ -65,7 +81,7 @@ const Home = observer(() => {
     } else {
       setSelectedAccount(defaultAccount);
     }
-  }, [currency]);
+  }, [currency, defaultAccount]);
 
   const { data: balanceRUR } = useBalance(contractAddresses["RUR"]);
   const { data: balanceUSDT } = useBalance(contractAddresses["USDT"]);
@@ -168,7 +184,10 @@ const Home = observer(() => {
     router.push(url);
   };
 
-  const showAccountSelection = !currency;
+  // Определяем, нужно ли показывать выбор счета
+  // На мобильных: скрываем, если currency указан
+  // На десктопах: всегда показываем
+  const showAccountSelection = !(isMobile && currency);
 
   // Функция обработки согласия с условиями
   const handleAcceptTos = async () => {
@@ -200,9 +219,8 @@ const Home = observer(() => {
       {/* Модальное окно с договором оферты */}
       {showTosModal && <AgreementModal onAccept={handleAcceptTos} />}
 
-      {/* Остальная часть компонента */}
-      {/* Кнопка "Вернуться к выбору счета", если currency указан */}
-      {!showAccountSelection && (
+      {/* Кнопка "Вернуться к выбору счета", если currency указан и устройство мобильное */}
+      {!showAccountSelection && isMobile && (
         <button
           className="back-button"
           onClick={() => {
@@ -221,16 +239,29 @@ const Home = observer(() => {
           <div className="account-list">
             {fetchedContracts.map(({ currency, metadata }, index) => {
               if (currency === "CREATE_RUR") {
-                // Отображаем кнопку "Создать рублевый счет" аккуратно
+                // Отображаем кнопку "Создать рублевый счет" аккуратнее
                 return (
-                  <div
-                    onClick={() => handleAccountClick(currency)}
-                    key={index}
-                    className="account"
-                  >
-                    <i className="fas fa-plus-circle account-icon"></i>
-                    <span>{metadata?.name}</span>
-                  </div>
+                  <>
+                    {!sentRequest ? (
+                      <div
+                        onClick={() => handleAccountClick(currency)}
+                        key={index}
+                        className="account new-account"
+                      >
+                        <i className="fas fa-plus-circle account-icon"></i>
+                        <span>{metadata?.name}</span>
+                      </div>
+                    ) : (
+                      <>
+                        <div className={`account new-account`} key={index}>
+                          <i className="fas fa-wallet account-icon"></i>
+                          <span>Рубль (RUR)</span>
+                          <span className="amount">Заявка обрабатывается</span>
+                        </div>
+                      </>
+                    )}
+                  </>
+                
                 );
               } else {
                 // Отображаем остальные счета
@@ -280,7 +311,7 @@ const Home = observer(() => {
                 </div>
                 <div className="wallet-actions">
                   {/* Кнопка "Иностранный Платеж" доступна для всех валют */}
-                  {userApproved ? (
+                  {true && (
                     <button
                       onClick={() =>
                         handleNavigation(`/withdraw/${selectedAccount}`)
@@ -288,8 +319,6 @@ const Home = observer(() => {
                     >
                       Трансграничный Платеж
                     </button>
-                  ) : (
-                    <></>
                   )}
                   {/* Остальные кнопки */}
                   {selectedAccount === "RUR" ? (
@@ -333,9 +362,7 @@ const Home = observer(() => {
 
                       <button
                         onClick={() =>
-                          handleNavigation(
-                            `/swap?inCurrency=${selectedAccount}`
-                          )
+                          handleNavigation(`/swap?inCurrency=${selectedAccount}`)
                         }
                       >
                         Обменять
@@ -367,29 +394,11 @@ const Home = observer(() => {
       {/* Стили */}
       <style jsx>{`
         /* Остальные стили */
-        .amount {
-          margin-top: 5px;
-          font-size: 1.2em;
-          color: #333;
+        .accounts {
+          transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out;
+          overflow: hidden;
         }
-        .wallet-actions {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
-          margin-top: 20px;
-        }
-        .wallet-actions button {
-          padding: 10px 20px;
-          border: none;
-          border-radius: 5px;
-          color: white;
-          background-color: #1890ff;
-          cursor: pointer;
-          transition: background-color 0.3s ease;
-        }
-        .wallet-actions button:hover {
-          background-color: #40a9ff;
-        }
+        
         .back-button {
           padding: 10px 0px;
           margin-bottom: 20px;

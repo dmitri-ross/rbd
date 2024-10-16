@@ -7,9 +7,9 @@ import QRCode from 'react-qr-code';
 const DepositBlock = ({ symbol }) => {
   const { user } = useUser();
   const [userId, setUserId] = useState("");
-  const [isApproved, setUserIsApproved] = useState(false);
+  
   const [userAddress, setUserAddress] = useState("");
-
+  const [isApproved, setUserIsApproved] = useState(false);
   useEffect(() => {
     const userDatawithData: any = user;
     if (userDatawithData && userDatawithData.data) {

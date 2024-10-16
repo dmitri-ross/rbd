@@ -290,7 +290,7 @@ const CreateRurForm = ({ onSubmit }) => {
           checked={agreePersonalData}
           onChange={(e) => setAgreePersonalData(e.target.checked)}
         />
-        <label htmlFor="agreePersonalData">
+        <label className="px-2" htmlFor="agreePersonalData">
           Я согласен на обработку персональных данных
         </label>
         {errors.agreePersonalData && (
@@ -302,11 +302,12 @@ const CreateRurForm = ({ onSubmit }) => {
       <div className={styles.formGroupCheckbox}>
         <input
           type="checkbox"
+          
           id="confirmRepresentative"
           checked={confirmRepresentative}
           onChange={(e) => setConfirmRepresentative(e.target.checked)}
         />
-        <label htmlFor="confirmRepresentative">
+        <label className="px-2" htmlFor="confirmRepresentative">
           Я подтверждаю, что являюсь законным представителем юридического или физического лица
         </label>
         {errors.confirmRepresentative && (

@@ -132,9 +132,7 @@ const TokensTxBlock = ({ symbol }: { symbol: string }) => {
                         <br />{" "}
                       </>
                     ) : (
-                      <></>
-                    )}
-                    <button
+                      <button
                       className="tx-button"
                       onClick={(e) => {
                         e.preventDefault();
@@ -143,6 +141,8 @@ const TokensTxBlock = ({ symbol }: { symbol: string }) => {
                     >
                       Детали транзакции
                     </button>
+                    )}
+                   
                   </td>
                 </tr>
               );

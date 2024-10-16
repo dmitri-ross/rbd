@@ -1658,3 +1658,9 @@ pre{
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }
+.new-account{
+  background-color: #f9f9f9;
+}
+.new-account .amount{
+  font-size: 18px;
+}

@@ -338,7 +338,7 @@ const WithdrawBlock = ({ symbol = "RUR" }) => {
   // Определяем, разрешен ли вывод средств
   const canWithdraw =
     (symbol === "RUR" && isSelf === true) ||
-    (["USDT", "USDC", "RUBi"].includes(symbol) && isSelf === false);
+    (["USDT", "USDC", "RUBi", "RUR"].includes(symbol) && isSelf === false);
 
   // Дополнительные поля, если isSelf == false и isApproved == false
   const [organizationName, setOrganizationName] = useState("");

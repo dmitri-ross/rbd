@@ -1,3 +1,5 @@
+// pages/api/transaction-success.ts
+
 import type { NextApiRequest, NextApiResponse } from 'next';
 import formidable from 'formidable';
 import fs from 'fs';
@@ -14,16 +16,16 @@ export const config = {
   },
 };
 
-// Function to parse the incoming form data using formidable
+// Функция для парсинга входящих данных формы с помощью formidable
 const parseForm = (
   req: NextApiRequest
 ): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
   return new Promise((resolve, reject) => {
     const form = formidable({
       multiples: true,
-      maxFileSize: 10 * 1024 * 1024, // 10 MB limit
-      uploadDir: os.tmpdir(), // Use the OS temporary directory
-      keepExtensions: true, // Keep file extensions
+      maxFileSize: 10 * 1024 * 1024, // Лимит 10 МБ
+      uploadDir: os.tmpdir(), // Используем временную директорию ОС
+      keepExtensions: true, // Сохраняем расширения файлов
     });
     form.parse(req, (err, fields, files) => {
       if (err) reject(err);
@@ -32,8 +34,9 @@ const parseForm = (
   });
 };
 
-// Function to extract field value as string
-const getFieldValue = (field: string | string[]): string => {
+// Функция для извлечения значения поля как строки
+const getFieldValue = (field: any): string => {
+  if (!field) return '';
   if (Array.isArray(field)) {
     return field[0];
   } else {
@@ -48,46 +51,62 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    // Authenticate the user
+    // Аутентификация пользователя
     const user = await getUser(req);
     if (!user || !user.address) {
       return res.status(401).json({ error: 'Неавторизованный доступ.' });
     }
 
-    // Parse the form data
+    // Парсинг данных формы
     const { fields, files } = await parseForm(req);
 
-    // Debugging
+    // Дебаггинг
     console.log('Fields received:', fields);
     console.log('Files received:', files);
 
-    // Extract form fields
+    // Извлечение полей формы
     const sender = getFieldValue(fields.sender);
     const tokenAddress = getFieldValue(fields.tokenAddress);
     const amount = getFieldValue(fields.amount);
-    const bankName = getFieldValue(fields.bankName);
-    const bik = getFieldValue(fields.bik);
+    const amountToPay = getFieldValue(fields.amountToPay);
+    const inputAmountForeign = getFieldValue(fields.inputAmountForeign);
+    const selectedCurrency = getFieldValue(fields.selectedCurrency);
+    const beneficiaryType = getFieldValue(fields.beneficiaryType);
+    const accountName = getFieldValue(fields.accountName);
     const accountNumber = getFieldValue(fields.accountNumber);
-    const swiftCode = getFieldValue(fields.swiftCode);
-    const iban = getFieldValue(fields.iban);
+    const bankName = getFieldValue(fields.bankName);
+    const swiftOrBik = getFieldValue(fields.swiftOrBik);
+    const email = getFieldValue(fields.email);
+    const addressField = getFieldValue(fields.addressField);
     const symbol = getFieldValue(fields.symbol);
     const txHash = getFieldValue(fields.txHash);
-    const country = getFieldValue(fields.country);
     const paymentPurpose = getFieldValue(fields.paymentPurpose);
 
-    // Validate required fields
-    if (
-      !sender ||
-      !tokenAddress ||
-      !amount ||
-      !symbol ||
-      !txHash ||
-      !country ||
-      !paymentPurpose
-    ) {
+    // Организационные поля
+    const organizationName = getFieldValue(fields.organizationName);
+    const inn = getFieldValue(fields.inn);
+    const kpp = getFieldValue(fields.kpp);
+    const legalAddress = getFieldValue(fields.legalAddress);
+    const actualAddress = getFieldValue(fields.actualAddress);
+    const contactPerson = getFieldValue(fields.contactPerson);
+    const phone = getFieldValue(fields.phone);
+
+    // Валидация обязательных полей
+    if (!sender || !symbol || !paymentPurpose) {
       return res.status(400).json({ error: 'Все обязательные поля должны быть заполнены.' });
     }
 
+    if (symbol === 'INVOICE') {
+      if (!amountToPay || !inputAmountForeign || !selectedCurrency) {
+        return res.status(400).json({ error: 'Все обязательные поля ��олжны быть заполнены.' });
+      }
+    } else {
+      if (!tokenAddress || !amount || !txHash) {
+        return res.status(400).json({ error: 'Все обязательные поля должны быть заполнены.' });
+      }
+    }
+
+    // Обработка загруженных документов
     const documentFile = files.document;
     const docFile = Array.isArray(documentFile) ? documentFile[0] : documentFile;
 
@@ -97,7 +116,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.log('docFile.filepath:', docFile.filepath);
 
       if (docFile.filepath) {
-        // Upload document to IPFS via Thirdweb SDK
+        // Загрузка документа в IPFS через Thirdweb SDK
         const sdk = ThirdwebSDK.fromPrivateKey(
           process.env.THIRDWEB_AUTH_PRIVATE_KEY as string,
           'polygon',
@@ -123,29 +142,52 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.error('No documentFile provided');
     }
 
-    // Insert a record into the withdrawals table
+    // Добавление записи в таблицу withdrawals
     try {
       const insertText = `
         INSERT INTO withdrawals (
-          user_address, sender, token_address, amount, bank_name, bik, account_number, swift_code, iban, symbol, tx_hash, country, payment_purpose, document_ipfs_link, status, created_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 'на исполнении', NOW())
+          user_address, sender, token_address, amount, 
+          amount_to_pay, input_amount_foreign, selected_currency, 
+          symbol, tx_hash, payment_purpose, bank_name, 
+          swift_or_bik, account_number, bank_address, 
+          beneficiary_type, account_name, email, 
+          document_ipfs_link, status, 
+          organization_name, inn, kpp, legal_address, 
+          actual_address, contact_person, phone
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 
+          $11, $12, $13, $14, $15, $16, $17, $18, 
+          'на исполнении',
+          $19, $20, $21, $22, $23, $24, $25
+        )
         RETURNING *;
       `;
       const insertValues = [
-        user.address,
-        sender,
-        tokenAddress,
-        amount,
-        bankName || null,
-        bik || null,
-        accountNumber || null,
-        swiftCode || null,
-        iban || null,
-        symbol,
-        txHash,
-        country,
-        paymentPurpose,
-        documentIpfsLink || null,
+        user.address,              // $1
+        sender,                    // $2
+        tokenAddress || null,      // $3
+        amount || null,            // $4
+        amountToPay || null,       // $5
+        inputAmountForeign || null,// $6
+        selectedCurrency || null,  // $7
+        symbol,                    // $8
+        txHash || null,           // $9
+        paymentPurpose,           // $10
+        bankName || null,         // $11
+        swiftOrBik || null,       // $12
+        accountNumber || null,     // $13
+        addressField || null,      // $14
+        beneficiaryType || null,   // $15
+        accountName || null,       // $16
+        email || null,            // $17
+        documentIpfsLink || null,  // $18
+        organizationName || null,  // $19
+        inn || null,              // $20
+        kpp || null,              // $21
+        legalAddress || null,      // $22
+        actualAddress || null,     // $23
+        contactPerson || null,     // $24
+        phone || null             // $25
       ];
 
       const result = await query(insertText, insertValues);
@@ -155,38 +197,53 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(500).json({ error: 'Не удалось создать запись о выводе средств' });
     }
 
-    // Build bank details based on country
-    let bankDetails = '';
-    if (country === 'RU') {
-      bankDetails = `<b>Банк:</b> ${bankName}\n<b>БИК:</b> ${bik}\n<b>Счет:</b> ${accountNumber}`;
-    } else if (country === 'CN') {
-      bankDetails = `<b>Банк:</b> ${bankName}\n<b>SWIFT:</b> ${swiftCode}\n<b>Счет:</b> ${accountNumber}`;
-    } else if (country === 'AE' || country === 'TR') {
-      bankDetails = `<b>Банк:</b> ${bankName}\n<b>IBAN:</b> ${iban}`;
+    // Формирование банковских деталей
+    let bankDetails = `
+<b>Тип получателя:</b> ${beneficiaryType}
+<b>Наименование счета:</b> ${accountName}
+<b>Номер счета:</b> ${accountNumber}
+<b>Банк:</b> ${bankName}
+<b>${selectedCurrency === 'RUB' ? 'БИК' : 'SWIFT/BIC'}:</b> ${swiftOrBik}
+<b>Email:</b> ${email}
+<b>Адрес:</b> ${addressField}
+`;
+
+    let additionalInfo = '';
+    if (organizationName || inn || kpp || legalAddress || actualAddress || contactPerson || phone) {
+      additionalInfo = `
+<b>Дополнительная информация о плательщике:</b>
+<b>Название организации:</b> ${organizationName}
+<b>ИНН:</b> ${inn}
+<b>КПП:</b> ${kpp}
+<b>Юридический адрес:</b> ${legalAddress}
+<b>Фактический адрес:</b> ${actualAddress}
+<b>Контактное лицо:</b> ${contactPerson}
+<b>Телефон:</b> ${phone}
+`;
     }
 
-    // Build the Telegram message
-    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-    const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+    let transactionLink = txHash ? `<a href="${explorerBaseURL}${txHash}">Просмотр транзакции</a>` : '';
 
     const text = `
 <b>Новый запрос на вывод средств:</b>
 --------------------------
 <b>Отправитель:</b> ${sender}
 <b>${sender === user.address ? 'Отправитель подтвержден' : 'Отправитель не подтвержден'}</b>
-<b>Сумма:</b> ${amount} ${symbol}
+<b>Способ оплаты:</b> ${symbol}
+<b>Сумма:</b> ${amount || '0'} ${symbol}
+<b>Сумма платежа:</b> ${inputAmountForeign || 'N/A'} ${selectedCurrency || ''}
+<b>Примерная сумма инвойса:</b> ${amountToPay || 'N/A'} RUB
 ${bankDetails}
-<b>Страна:</b> ${country}
 <b>Назначение платежа:</b> ${paymentPurpose}
-${
-  documentIpfsLink
-    ? `<b>Документ:</b> <a href="${documentIpfsLink}">Ссылка на документ</a>`
-    : ''
-}
-<a href="${explorerBaseURL}${txHash}">Просмотр транзакции</a>
+${additionalInfo}
+${documentIpfsLink ? `<b>Документ:</b> <a href="${documentIpfsLink}">Ссылка на документ</a>` : ''}
+${transactionLink}
 `;
 
-    // Send message to Telegram
+    // Отправка сообщения в Telegram
+    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+    const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+
     try {
       await axios.get(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
         params: {
@@ -205,7 +262,7 @@ ${
       res.status(500).json({ error: 'Не удалось отправить сообщение в Telegram' });
     }
   } catch (error) {
-    console.error('Ошибка в обработчике transaction-success:', error);
-    res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    console.error('Ошибка при обработке запроса:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 }

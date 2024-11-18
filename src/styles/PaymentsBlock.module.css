@@ -1,0 +1,59 @@
+/* styles/PaymentsBlock.module.css */
+
+.paymentsContainer {
+    margin-top: 20px;
+  }
+  
+  .paymentsContainer h2 {
+    margin-bottom: 10px;
+  }
+  
+  .paymentsTable {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .paymentsTable th,
+  .paymentsTable td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+  }
+  
+  .paymentsTable th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+  
+  .paymentsTable tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .paymentsTable tr:hover {
+    background-color: #eaeaea;
+  }
+  
+  .link {
+    color: #1890ff;
+    text-decoration: none;
+  }
+  
+  .link:hover {
+    text-decoration: underline;
+  }
+  
+  .actionButton {
+    padding: 5px 10px;
+    margin: 2px;
+    border: none;
+    background-color: #1890ff;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  
+  .actionButton:hover {
+    background-color: #40a9ff;
+  }
+  

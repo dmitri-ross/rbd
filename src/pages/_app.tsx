@@ -45,6 +45,14 @@ function MyApp({ Component, pageProps }) {
       icon: "fas fa-file-invoice-dollar",
       label: "Новый платеж",
     },
+    {
+      href: "/payments",
+      icon: "fas fa-file-invoice-dollar",
+      label: "История платежей",
+    },
+   
+    
+    
     { href: "/swap", icon: "fas fa-swap-alt", label: "Обмен ИЦП" },
     {
       href: "/deposit/RUR",

@@ -26,13 +26,13 @@ export default function Withdraw() {
      
       <BackButton />
         {isSelf ? 
-        <h1>Вывод средств {symbol?.toString()}</h1>
+        <h1>Вывод средств </h1>
         :
-        <h1>Новый платеж {symbol?.toString()}</h1>
+        <h1>Новый платеж </h1>
 }
       </div>
 
-      <WithdrawBlock symbol={symbol?.toString()} />
+      <WithdrawBlock/>
     </>
   );
 }

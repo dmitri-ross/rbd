@@ -27,8 +27,8 @@ export const ConnectBlock = ({ symbol = "RUR", onlyBalance = false }) => {
   useEffect(() => {
     const userData: any = user;
     if (userData && userData.data) {
-      const name = userData.data.organizationName || "";
-      setOrganizationName(truncateString(name, 14));
+      const name = `${userData.data.organizationName}   (${userData.data.legalRepresentativeName})` || "";
+      setOrganizationName(truncateString(name, 26));
     }
   }, [user]);
 
@@ -37,7 +37,7 @@ export const ConnectBlock = ({ symbol = "RUR", onlyBalance = false }) => {
       <div className="header-organization">
         {organizationName && <span>{organizationName}</span>}
       </div>
-      <ConnectWallet
+      {/* <ConnectWallet
         modalTitleIconUrl={""}
         hideSwitchToPersonalWallet={true}
         displayBalanceToken={{
@@ -67,7 +67,7 @@ export const ConnectBlock = ({ symbol = "RUR", onlyBalance = false }) => {
         }}
         theme="light"
         className={`connect ${onlyBalance ? "onlyBalance" : "balance"}`}
-      />
+      /> */}
     </>
   );
 };

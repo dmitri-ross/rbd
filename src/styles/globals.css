@@ -808,10 +808,12 @@ footer a {
   font-size: 16px;
   color: #2f3542;
   border-bottom: 1px solid #e2e8f0;
+  
 }
 
 .transactions-table th {
-  background-color: #f1f4f9;
+  background-color: #003366;
+  color:#fff;
   font-weight: 700;
 }
 
@@ -1457,7 +1459,9 @@ header .user-info a:hover {
 }
 
 .transactions-table th {
-  background-color: #f1f4f9;
+  
+  background-color: #003366;
+  color:#fff;
   font-weight: 700;
 }
 
@@ -1663,4 +1667,27 @@ pre{
 }
 .new-account .amount{
   font-size: 18px;
+}
+.currency-select{
+  margin-bottom: 10px;
+}
+
+
+
+.new-payment-button {
+  background-color: #003366;
+  border: none;
+  padding: 15px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #fff;
+  font-weight: 500;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.new-payment-button:hover {
+  background-color: #005b99;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

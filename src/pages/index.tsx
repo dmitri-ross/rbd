@@ -18,8 +18,8 @@ import {
 } from "../../const/contracts";
 import TokensTxBlock from "../components/TokensTxBlock";
 import { motion, AnimatePresence } from "framer-motion";
-import AgreementModal from "../components/AgreementModal"; // Импортируем новый компонент
-import useIsMobile from "../hooks/useIsMobile"; // Импортируем хук
+import AgreementModal from "../components/AgreementModal";
+import useIsMobile from "../hooks/useIsMobile";
 
 import styles from "../styles/Home.module.css";
 
@@ -235,6 +235,38 @@ const Home = observer(() => {
       {/* Компонент выбора счета */}
       {showAccountSelection && (
         <div className="accounts">
+          {/* Новый блок с кнопкой "Создать трансграничный платеж" */}
+
+          {/* <motion.div
+            key={`cross-border`}
+            className="cross-border-section"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="wallet-card ">
+              <div className="wallet-info">
+                <div className="wallet-details max-w-[80%]">
+                  <h2>Трансграничный платеж</h2>
+                  Трансграничный платеж позволяет вам отправлять средства за
+                  границу с минимальными комиссиями и высокой скоростью. Вы
+                  можете использовать эту функцию для международных переводов и
+                  оплаты услуг за рубежом.
+                </div>
+                <div className="wallet-actions ">
+                  <button
+                    onClick={() =>
+                      handleNavigation(`/withdraw/INVOICE`)
+                    }
+                  >
+                    Создать трансграничный платеж
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div> */}
+
           <h2>Выбор счета:</h2>
           <div className="account-list">
             {fetchedContracts.map(({ currency, metadata }, index) => {
@@ -261,7 +293,6 @@ const Home = observer(() => {
                       </>
                     )}
                   </>
-                
                 );
               } else {
                 // Отображаем остальные счета
@@ -310,7 +341,7 @@ const Home = observer(() => {
                   </span>
                 </div>
                 <div className="wallet-actions">
-                  {/* Кнопка "Иностранный Платеж" доступна для всех валют */}
+                  {/* Кнопка "Трансграничный Платеж" доступна для всех валют */}
                   {true && (
                     <button
                       onClick={() =>
@@ -362,7 +393,9 @@ const Home = observer(() => {
 
                       <button
                         onClick={() =>
-                          handleNavigation(`/swap?inCurrency=${selectedAccount}`)
+                          handleNavigation(
+                            `/swap?inCurrency=${selectedAccount}`
+                          )
                         }
                       >
                         Обменять
@@ -398,7 +431,7 @@ const Home = observer(() => {
           transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out;
           overflow: hidden;
         }
-        
+
         .back-button {
           padding: 10px 0px;
           margin-bottom: 20px;
@@ -419,6 +452,33 @@ const Home = observer(() => {
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
           }
+        }
+
+        /* Стили для нового блока */
+        .cross-border-section {
+          margin-top: 20px;
+        }
+        .cross-border-card {
+          background-color: #f9f9f9;
+          padding: 20px;
+          border-radius: 8px;
+        }
+        .cross-border-card p {
+          margin-bottom: 20px;
+          font-size: 1em;
+          line-height: 1.5;
+        }
+        .cross-border-card button {
+          padding: 10px 20px;
+          background-color: #1890ff;
+          color: #fff;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 1em;
+        }
+        .cross-border-card button:hover {
+          background-color: #1070d3;
         }
       `}</style>
     </>
